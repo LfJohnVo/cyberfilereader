@@ -1,0 +1,72 @@
+services:
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      # Solo overrides específicos del contenedor (rutas de montaje y CORS).
+      # Los endpoints y secretos (OLLAMA_BASE_URL, QDRANT_URL, QDRANT_API_KEY…)
+      # provienen de backend/.env vía env_file — NO se hardcodean aquí.
+      # Si Ollama corre en el propio host Docker, define en .env:
+      #   OLLAMA_BASE_URL=http://host.docker.internal:11434
+      DOCS_DIR: /data/docs
+      DATA_DIR: /data/state
+      ALLOWED_ORIGINS: http://localhost:8080
+    volumes:
+      - ./docs:/data/docs:ro          # la carpeta documental, SOLO LECTURA
+      - backend_state:/data/state     # manifest.json sobrevive reinicios
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Linux: alcanza al host
+    ports:
+      - "8000:8000"                   # útil en dev; elimínalo si solo entra nginx
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ------- solo con: docker compose --profile prod up -d -------
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["prod"]
+    environment:
+      POSTGRES_DB: sgi_agent
+      POSTGRES_USER: sgi
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sgi}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sgi -d sgi_agent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["prod"]
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  backend_state:
+  pg_data:
+  redis_data:

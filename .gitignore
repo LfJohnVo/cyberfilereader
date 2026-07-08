@@ -1,0 +1,39 @@
+# Secretos y datos generados (nunca se versionan)
+.env
+.env.*
+!.env.example
+data/
+
+# Documentación fuente de la empresa: CONFIDENCIAL. No se versiona; vive en disco
+# y se monta de solo lectura (./docs:/data/docs:ro). Provista en cada entorno/despliegue.
+docs/
+
+# Configuración local del editor / herramientas
+.claude/
+
+# Documentación de proceso interno (no se publica)
+CLAUDE.md
+guidelines.md
+instructions.md
+skills-main/
+docs-proyecto/CHANGELOG-AGENTES.md
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Node / Vite
+node_modules/
+dist/
+*.local
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

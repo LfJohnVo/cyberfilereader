@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/* ===== Tema cyberpunk (cian/magenta sobre navy profundo) ===== */
+:root {
+  --bg: #050813;
+  --cyan: #22d3ee;
+  --cyan-soft: #67e8f9;
+  --magenta: #e879f9;
+  --magenta-soft: #f0abfc;
+  --text: #bae6fd;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 700px at 50% 15%, rgba(34, 211, 238, 0.06), transparent 60%),
+    radial-gradient(900px 600px at 80% 90%, rgba(232, 121, 249, 0.06), transparent 60%),
+    var(--bg);
+  color: var(--text);
+  font-family: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Paneles HUD con borde neón y desenfoque */
+.neon {
+  background: linear-gradient(180deg, rgba(10, 18, 38, 0.62), rgba(6, 10, 24, 0.5));
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  box-shadow:
+    0 0 22px rgba(34, 211, 238, 0.12),
+    inset 0 0 26px rgba(34, 211, 238, 0.05);
+}
+.neon-mag {
+  border-color: rgba(232, 121, 249, 0.42);
+  box-shadow:
+    0 0 22px rgba(232, 121, 249, 0.14),
+    inset 0 0 26px rgba(232, 121, 249, 0.05);
+}
+.glow {
+  text-shadow: 0 0 10px currentColor;
+}
+/* esquina biselada estilo HUD */
+.clip-hud {
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% calc(100% - 12px),
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
+}
+
+/* ===== Consola de chat: legibilidad sobre el fondo 3D ===== */
+/* Marco de 1px que sigue el bisel del clip-hud (capa exterior = "borde" neón) */
+.console-frame {
+  padding: 1px;
+  background: linear-gradient(
+    165deg,
+    rgba(34, 211, 238, 0.9),
+    rgba(34, 211, 238, 0.4) 45%,
+    rgba(232, 121, 249, 0.6)
+  );
+}
+/* Interior sólido casi opaco: el terreno/las partículas ya no atraviesan el texto */
+.console-panel {
+  background: rgba(4, 8, 18, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    inset 0 0 42px rgba(34, 211, 238, 0.06),
+    inset 0 1px 0 rgba(34, 211, 238, 0.12);
+}
+/* Sombra de texto sutil y oscura para despegar los mensajes (text-shadow se hereda) */
+.chat-text {
+  text-shadow: 0 1px 3px rgba(2, 6, 16, 0.9);
+}
+
+/* barrido de escaneo sutil sobre toda la pantalla */
+.scanlines::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(34, 211, 238, 0.035) 0px,
+    rgba(34, 211, 238, 0.035) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+  z-index: 50;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.4);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes cursorBlink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.caret::after {
+  content: "▋";
+  margin-left: 2px;
+  animation: cursorBlink 1s steps(1) infinite;
+  color: var(--cyan);
+}

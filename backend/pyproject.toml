@@ -1,0 +1,35 @@
+# Configuración de herramientas del backend (ruff + pytest).
+# Las dependencias se gestionan en requirements.txt (guidelines §5).
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]  # errores, pyflakes, imports, pyupgrade, bugbear
+ignore = []
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI usa llamadas (Header/Depends/Query…) como valores por defecto: no es B008.
+extend-immutable-calls = [
+    "fastapi.Header",
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Cookie",
+    "fastapi.Form",
+    "fastapi.File",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "scripts", "tests"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-q"

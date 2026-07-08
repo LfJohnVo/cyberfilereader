@@ -14,19 +14,36 @@ from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.services.rag.embeddings import get_embeddings
 from app.services.rag.llm import get_chat_model
-from app.services.rag.vectorstore import get_client, get_vectorstore
+from app.services.rag.vectorstore import ensure_collection, get_client, get_vectorstore
 
 s = get_settings()
 setup_logging()
+log = logging.getLogger(__name__)
 limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.qdrant = get_client()  # clientes creados UNA vez
-    app.state.vectorstore = get_vectorstore(app.state.qdrant, get_embeddings())
+    embeddings = get_embeddings()
+    client = get_client()
+
+    # Garantiza que la colección existe en Qdrant antes de construir el vectorstore.
+    # Hace un embed de prueba para conocer la dimensión del modelo configurado.
+    try:
+        dim = len(embeddings.embed_query("probe"))
+        ensure_collection(client, dim)
+    except Exception:
+        log.exception(
+            "No se pudo garantizar la colección Qdrant; "
+            "verifica QDRANT_URL, QDRANT_API_KEY y conectividad."
+        )
+        raise
+
+    app.state.qdrant = client
+    app.state.vectorstore = get_vectorstore(client, embeddings)
     app.state.llm = get_chat_model()
-    logging.getLogger(__name__).info("SGI-Agent listo (modelo=%s)", s.ollama_chat_model)
+    log.info("SGI-Agent listo (modelo=%s)", s.ollama_chat_model)
+
     yield
 
 

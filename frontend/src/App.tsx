@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import AgentStatusPanel from "./components/AgentStatusPanel";
 import ComplianceModal from "./components/ComplianceModal";
+import ErrorBoundary from "./components/ErrorBoundary";
 import VoiceControls from "./components/VoiceControls";
 import ChatPanel from "./components/chat/ChatPanel";
 import SourcesPanel from "./components/SourcesPanel";
@@ -14,9 +15,11 @@ export default function App() {
 
   return (
     <div className="scanlines relative h-screen w-screen overflow-hidden text-cyan-100">
-      {/* fondo 3D con el busto holográfico de la asistente */}
+      {/* fondo 3D reactivo (si WebGL falla, el degradado de fondo hace de respaldo) */}
       <div className="absolute inset-0">
-        <Scene />
+        <ErrorBoundary label="scene" fallback={null}>
+          <Scene />
+        </ErrorBoundary>
       </div>
 
       {/* barra superior */}

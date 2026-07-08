@@ -88,7 +88,23 @@ function ParticleField() {
   );
 }
 
+/** Detección de WebGL: si el navegador/GPU no lo soporta, evitamos montar el Canvas
+ *  (que lanzaría) y devolvemos un fondo estático. La app sigue 100% usable. */
+function webglAvailable(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(
+      window.WebGLRenderingContext &&
+      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default function Scene() {
+  if (!webglAvailable()) return null; // el degradado de fondo (CSS body) hace de respaldo
+
   return (
     <Canvas
       dpr={[1, 1.75]}

@@ -45,6 +45,7 @@ def settings_env(monkeypatch, tmp_path):
     monkeypatch.setenv("QDRANT_URL", "memory")  # nadie debe usarla en tests
     monkeypatch.setenv("SCORE_THRESHOLD", "0.35")  # calibrado para FakeEmbeddings
     monkeypatch.setenv("RETRIEVER_K", "5")
+    monkeypatch.setenv("RERANK_ENABLED", "false")  # sin red: el reranker descarga modelo
     get_settings.cache_clear()  # Settings está cacheado con lru_cache
     yield docs
     get_settings.cache_clear()

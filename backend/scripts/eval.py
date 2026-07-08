@@ -20,7 +20,7 @@ from pathlib import Path
 
 from app.core.config import get_settings
 from app.services.rag.embeddings import get_embeddings
-from app.services.rag.retriever import build_filter
+from app.services.rag.retriever import build_filter, retrieve
 from app.services.rag.vectorstore import get_client, get_vectorstore
 
 # Consolas Windows (cp1252) no codifican acentos/símbolos: forzamos UTF-8.
@@ -94,10 +94,30 @@ def _report_sweep(per_case: list[tuple[dict, list]], k: int) -> None:
     print(f"\nSugerencia de SCORE_THRESHOLD ~ {best[0]:.2f} (recall maximo).")
 
 
+def _report_pipeline(vs, cases: list[dict], s) -> None:
+    """Evalúa el camino REAL de /chat (retrieve: umbral + reranking + top-k)."""
+    hit, mrr_sum = 0, 0.0
+    for c in cases:
+        docs = retrieve(vs, c["pregunta"], c.get("areas"))
+        expected = set(c.get("fuentes_esperadas", []))
+        ranks = [
+            i for i, (d, _) in enumerate(docs, start=1) if d.metadata.get("file_name") in expected
+        ]
+        if ranks:
+            hit += 1
+            mrr_sum += 1 / ranks[0]
+    n = len(cases)
+    rr = f"ON ({s.rerank_model})" if s.rerank_enabled else "OFF"
+    print(f"[pipeline /chat] casos={n} k={s.retriever_k} umbral={s.score_threshold} rerank={rr}")
+    print(f"hit-rate@{s.retriever_k}: {hit / n:.1%}")
+    print(f"MRR@{s.retriever_k}:      {mrr_sum / n:.3f}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--candidates", type=int, default=20, help="candidatos por pregunta")
     ap.add_argument("--sweep", action="store_true", help="barrido de umbral para recalibrar")
+    ap.add_argument("--pipeline", action="store_true", help="evalúa retrieve() real")
     args = ap.parse_args()
 
     cases = _load_cases()
@@ -108,8 +128,12 @@ def main() -> None:
 
     s = get_settings()
     vs = get_vectorstore(get_client(), get_embeddings())
-    per_case = _search_all(vs, cases, args.candidates)
 
+    if args.pipeline:
+        _report_pipeline(vs, cases, s)
+        return
+
+    per_case = _search_all(vs, cases, args.candidates)
     if args.sweep:
         _report_sweep(per_case, s.retriever_k)
     else:

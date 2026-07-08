@@ -1,9 +1,13 @@
-"""Búsqueda semántica con filtro de estado + áreas permitidas y umbral de score."""
+"""Búsqueda semántica: filtro de estado + áreas permitidas, umbral y reordenamiento."""
+
+import logging
 
 from langchain_core.documents import Document
 from qdrant_client import models
 
 from app.core.config import get_settings
+
+log = logging.getLogger(__name__)
 
 
 def build_filter(areas: list[str] | None) -> models.Filter:
@@ -15,8 +19,18 @@ def build_filter(areas: list[str] | None) -> models.Filter:
 
 def retrieve(vectorstore, query: str, areas: list[str] | None) -> list[tuple[Document, float]]:
     s = get_settings()
-    hits = vectorstore.similarity_search_with_score(
-        query, k=s.retriever_k, filter=build_filter(areas)
-    )
-    # Con distancia COSINE, Qdrant devuelve similitud (mayor = mejor).
-    return [(d, score) for d, score in hits if score >= s.score_threshold]
+    filtro = build_filter(areas)
+    # Con reranking traemos más candidatos densos y el cross-encoder elige el top-k final.
+    k = s.rerank_candidates if s.rerank_enabled else s.retriever_k
+    hits = vectorstore.similarity_search_with_score(query, k=k, filter=filtro)
+    # Umbral coseno: decide si hay algo suficientemente relevante (si no -> NO_INFO).
+    hits = [(d, score) for d, score in hits if score >= s.score_threshold]
+    if not hits or not s.rerank_enabled:
+        return hits[: s.retriever_k]
+    try:
+        from app.services.rag.reranker import rerank
+
+        return rerank(query, hits)[: s.retriever_k]
+    except Exception:
+        log.warning("Reranker no disponible; se usa el orden denso", exc_info=True)
+        return hits[: s.retriever_k]

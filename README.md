@@ -71,6 +71,9 @@ Copia `.env.example` a `.env` y completa los valores reales.
 | `CHUNK_OVERLAP` | `150` | Solapamiento entre chunks. |
 | `RETRIEVER_K` | `5` | Nº de fragmentos recuperados por consulta. |
 | `SCORE_THRESHOLD` | `0.50` | Similitud coseno mínima para aceptar contexto (recalibrar por modelo de embeddings; ver `backend/tests/eval`). |
+| `RERANK_ENABLED` | `false` | Reordena los candidatos densos con un cross-encoder (activar tras validar; descarga modelo ~1 GB). |
+| `RERANK_MODEL` | `jinaai/jina-reranker-v2-base-multilingual` | Modelo cross-encoder (fastembed). Alternativa ligera: `Xenova/ms-marco-MiniLM-L-6-v2`. |
+| `RERANK_CANDIDATES` | `20` | Nº de candidatos densos que pasan al reranker. |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | URL de Ollama. En Docker: `http://host.docker.internal:11434`. |
 | `OLLAMA_CHAT_MODEL` | `qwen3:8b` | Modelo de chat. |
 | `OLLAMA_EMBED_MODEL` | `nomic-embed-text` | Modelo de embeddings. |

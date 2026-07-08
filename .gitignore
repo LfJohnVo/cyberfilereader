@@ -8,16 +8,6 @@ data/
 # y se monta de solo lectura (./docs:/data/docs:ro). Provista en cada entorno/despliegue.
 docs/
 
-# Configuración local del editor / herramientas
-.claude/
-
-# Documentación de proceso interno (no se publica)
-CLAUDE.md
-guidelines.md
-instructions.md
-skills-main/
-docs-proyecto/CHANGELOG-AGENTES.md
-
 # Python
 __pycache__/
 *.py[cod]
@@ -37,5 +27,3 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
-
-docs-proyecto/plans/

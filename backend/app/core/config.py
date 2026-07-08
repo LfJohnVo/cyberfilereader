@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     chunk_overlap: int = 150
     retriever_k: int = 5
     score_threshold: float = 0.50  # recalibrar por modelo de embeddings (ver tests/eval)
+    rerank_enabled: bool = False  # activar tras validar mejora en el set dorado
+    rerank_model: str = "jinaai/jina-reranker-v2-base-multilingual"
+    rerank_candidates: int = 20  # candidatos densos que reordena el cross-encoder
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_chat_model: str = "llama3.1:8b"

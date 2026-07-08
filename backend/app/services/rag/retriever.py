@@ -23,8 +23,9 @@ def retrieve(vectorstore, query: str, areas: list[str] | None) -> list[tuple[Doc
     # Con reranking traemos más candidatos densos y el cross-encoder elige el top-k final.
     k = s.rerank_candidates if s.rerank_enabled else s.retriever_k
     hits = vectorstore.similarity_search_with_score(query, k=k, filter=filtro)
-    # Umbral coseno: decide si hay algo suficientemente relevante (si no -> NO_INFO).
-    hits = [(d, score) for d, score in hits if score >= s.score_threshold]
+    if not s.hybrid_enabled:
+        # Umbral coseno (gate de NO_INFO). En híbrido el score es RRF (otra escala): no aplica.
+        hits = [(d, score) for d, score in hits if score >= s.score_threshold]
     if not hits or not s.rerank_enabled:
         return hits[: s.retriever_k]
     try:

@@ -9,7 +9,9 @@ import re
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
+from app.core.config import get_settings
 from app.services.memory import store as memory
+from app.services.rag.condense import condense_query
 from app.services.rag.llm import strip_reasoning
 from app.services.rag.prompts import (
     GREETING_MESSAGE,
@@ -69,7 +71,15 @@ def answer_question(
         memory.append(session_id, "assistant", GREETING_MESSAGE)
         return {"answer": GREETING_MESSAGE, "sources": [], "no_info": False}
 
-    hits = retrieve(vectorstore, question, areas)
+    # Reformula follow-ups con el historial para recuperar mejor (la generación ve el historial).
+    history = memory.get_history(session_id)
+    search_q = question
+    if get_settings().condense_enabled:
+        search_q = condense_query(llm, history, question)
+        if search_q != question:
+            log.info("condense sid=%s: %.100s -> %.100s", session_id, question, search_q)
+
+    hits = retrieve(vectorstore, search_q, areas)
     if not hits:
         memory.append(session_id, "user", question)
         memory.append(session_id, "assistant", NO_INFO_MESSAGE)
@@ -77,7 +87,7 @@ def answer_question(
 
     context, fuentes = _format_context(hits)
     mensajes: list = [SystemMessage(content=SYSTEM_PROMPT)]
-    for role, content in memory.get_history(session_id):
+    for role, content in history:
         mensajes.append(
             HumanMessage(content=content) if role == "user" else AIMessage(content=content)
         )

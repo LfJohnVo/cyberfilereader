@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     rerank_enabled: bool = False  # activar tras validar mejora en el set dorado
     rerank_model: str = "jinaai/jina-reranker-v2-base-multilingual"
     rerank_candidates: int = 20  # candidatos densos que reordena el cross-encoder
+    hybrid_enabled: bool = False  # densa + BM25; requiere re-ingesta (vectores nombrados)
+    sparse_model: str = "Qdrant/bm25"  # embedding disperso (léxico) para el modo híbrido
+    condense_enabled: bool = True  # reformular la consulta con el historial (follow-ups)
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_chat_model: str = "llama3.1:8b"

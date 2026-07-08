@@ -1,0 +1,61 @@
+{
+  "_descripcion": "Set dorado para evaluar la recuperación (Fase 0). Los siguientes casos usan file_name REALES de la colección (obtenidos con 'python -m scripts.check_collection'). VERIFICA que cada pregunta se responde con el archivo indicado y AÑADE más hasta llegar a 25-40 casos variados. 'areas': null usa solo el filtro estado=vigente (acceso total); pon una lista para restringir por área. 'fuentes_esperadas' debe apuntar a la versión VIGENTE del documento.",
+  "casos": [
+    {
+      "id": "proteccion-datos",
+      "pregunta": "¿Cómo se clasifican y protegen los datos personales según la política?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-ENS-002 Politica General de Proteccion de Datos Personales v1.pdf"]
+    },
+    {
+      "id": "m-ens-002-codigo",
+      "pregunta": "¿Qué exige el documento M-ENS-002 sobre datos personales?",
+      "tipo": "codigo-clausula",
+      "areas": null,
+      "fuentes_esperadas": ["M-ENS-002 Politica General de Proteccion de Datos Personales v1.pdf"]
+    },
+    {
+      "id": "vacaciones",
+      "pregunta": "¿Cuántos días de vacaciones corresponden y cómo se solicitan?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-GET-003 Politica de vacaciones y dias festivos_v3.pdf"]
+    },
+    {
+      "id": "codigo-etica",
+      "pregunta": "¿Qué conductas prohíbe el código de ética y conducta?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-GET-001_Código de Ética y Conducta_v3.pdf"]
+    },
+    {
+      "id": "home-office",
+      "pregunta": "¿Qué establece la política de home office?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-GET-009_Manual_Políticas Home Office v1.pdf"]
+    },
+    {
+      "id": "analisis-riesgo",
+      "pregunta": "¿Qué metodología se usa para el análisis de riesgos?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-005 Metodologia de Analisis de Riesgo v8.pdf"]
+    },
+    {
+      "id": "pentest-web",
+      "pregunta": "¿Qué fases tiene la prueba de intrusión a aplicaciones web?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-005 Metodología General de Pruebas de Intrusión a Aplicaciones Web v2.pdf"]
+    },
+    {
+      "id": "capacitacion",
+      "pregunta": "¿Cómo funciona el proceso de capacitación del personal?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CAP-001 Manual de capacitación v1.pdf"]
+    }
+  ]
+}

@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     chunk_size: int = 1000
     chunk_overlap: int = 150
     retriever_k: int = 5
-    score_threshold: float = 0.35
+    score_threshold: float = 0.50  # recalibrar por modelo de embeddings (ver tests/eval)
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_chat_model: str = "llama3.1:8b"

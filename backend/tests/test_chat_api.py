@@ -1,3 +1,5 @@
+import types
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -9,10 +11,14 @@ from app.services.rag.prompts import NO_INFO_MESSAGE
 @pytest.fixture()
 def client(monkeypatch):
     # El lifespan crea clientes reales: se sustituyen las factorías EN main.
+    # embeddings necesita embed_query (el lifespan sondea la dimensión) y se
+    # neutraliza ensure_collection para no tocar Qdrant en las pruebas.
+    fake_emb = types.SimpleNamespace(embed_query=lambda _t: [0.0] * 768)
     monkeypatch.setattr(main_mod, "get_client", lambda: object())
-    monkeypatch.setattr(main_mod, "get_embeddings", lambda: object())
+    monkeypatch.setattr(main_mod, "get_embeddings", lambda: fake_emb)
     monkeypatch.setattr(main_mod, "get_vectorstore", lambda c, e: object())
     monkeypatch.setattr(main_mod, "get_chat_model", lambda: object())
+    monkeypatch.setattr(main_mod, "ensure_collection", lambda *a, **k: None)
     with TestClient(main_mod.app) as c:  # el 'with' dispara el lifespan
         yield c
 

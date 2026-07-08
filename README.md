@@ -70,7 +70,7 @@ Copia `.env.example` a `.env` y completa los valores reales.
 | `CHUNK_SIZE` | `1000` | Tamaño de chunk (caracteres). |
 | `CHUNK_OVERLAP` | `150` | Solapamiento entre chunks. |
 | `RETRIEVER_K` | `5` | Nº de fragmentos recuperados por consulta. |
-| `SCORE_THRESHOLD` | `0.65` | Similitud coseno mínima para aceptar contexto. |
+| `SCORE_THRESHOLD` | `0.50` | Similitud coseno mínima para aceptar contexto (recalibrar por modelo de embeddings; ver `backend/tests/eval`). |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | URL de Ollama. En Docker: `http://host.docker.internal:11434`. |
 | `OLLAMA_CHAT_MODEL` | `qwen3:8b` | Modelo de chat. |
 | `OLLAMA_EMBED_MODEL` | `nomic-embed-text` | Modelo de embeddings. |

@@ -10,17 +10,17 @@ services:
       #   OLLAMA_BASE_URL=http://host.docker.internal:11434
       DOCS_DIR: /data/docs
       DATA_DIR: /data/state
-      ALLOWED_ORIGINS: http://localhost:8080
+      ALLOWED_ORIGINS: http://localhost:5000
     volumes:
       - ./docs:/data/docs:ro          # la carpeta documental, SOLO LECTURA
       - backend_state:/data/state     # manifest.json sobrevive reinicios
     extra_hosts:
       - "host.docker.internal:host-gateway"   # Linux: alcanza al host
     ports:
-      - "8000:8000"                   # útil en dev; elimínalo si solo entra nginx
+      - "5001:5001"                   # útil en dev; elimínalo si solo entra nginx
     healthcheck:
       test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=5)"]
+             "import urllib.request; urllib.request.urlopen('http://localhost:5001/api/health', timeout=5)"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -30,7 +30,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "8080:80"
+      - "5000:80"
     depends_on:
       backend:
         condition: service_healthy

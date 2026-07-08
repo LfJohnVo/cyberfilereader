@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     // En desarrollo, /api se reenvía al backend (en producción lo hace nginx).
     proxy: {
-      "/api": "http://127.0.0.1:8000",
+      "/api": "http://127.0.0.1:5001",
     },
   },
 })

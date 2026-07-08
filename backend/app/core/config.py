@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     env: str = "dev"
     log_level: str = "INFO"
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = 5001
     allowed_origins: str = "http://localhost:5173"
 
     docs_dir: str = "./docs"

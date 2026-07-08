@@ -31,7 +31,7 @@ cd backend
 py -3.12 -m venv .venv
 .venv\Scripts\activate            # Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-uvicorn app.main:app --reload     # http://localhost:8000
+uvicorn app.main:app --reload     # http://localhost:5001
 
 # Ingesta de documentos (coloca los archivos en docs/<Área>/…)
 python -m scripts.ingest
@@ -45,7 +45,7 @@ npm run dev                       # http://localhost:5173
 ### Docker
 
 ```bash
-docker compose up --build -d      # app en http://localhost:8080
+docker compose up --build -d      # app en http://localhost:5000
 docker compose exec backend python -m scripts.ingest
 ```
 
@@ -61,7 +61,7 @@ Copia `.env.example` a `.env` y completa los valores reales.
 | `ENV` | `dev` | Entorno de ejecución (`dev` / `prod`). |
 | `LOG_LEVEL` | `INFO` | Nivel de logging. |
 | `API_HOST` | `0.0.0.0` | Host de escucha de la API. |
-| `API_PORT` | `8000` | Puerto de la API. |
+| `API_PORT` | `5001` | Puerto de la API. |
 | `ALLOWED_ORIGINS` | `http://localhost:5173` | Lista blanca CORS separada por comas. |
 | `DOCS_DIR` | `./docs` | Carpeta raíz de documentos (solo lectura). En Docker: `/data/docs`. |
 | `DATA_DIR` | `./data` | Carpeta de estado generado (`manifest.json`). |
@@ -83,7 +83,7 @@ Copia `.env.example` a `.env` y completa los valores reales.
 | `REDIS_URL` | — | (prod) Cadena de conexión Redis. |
 | `JWT_SECRET` | `dev-only` | (prod) Secreto de firma JWT (usar 32+ bytes aleatorios). |
 | `JWT_EXPIRE_MINUTES` | `480` | (prod) Expiración del token JWT. |
-| `VITE_API_URL` | `http://localhost:8000` | (frontend) Base de la API; vacía en build Docker (proxy nginx). |
+| `VITE_API_URL` | `http://localhost:5001` | (frontend) Base de la API; vacía en build Docker (proxy nginx). |
 
 > Las variables `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` del `.env.example`
 > las consume solo el contenedor `postgres` (perfil `prod`).

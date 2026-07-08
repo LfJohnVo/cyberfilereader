@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import { create } from "zustand";
 import { sendChat, type Source } from "../lib/api";
 import { speak, stopSpeaking } from "../lib/tts";
@@ -10,7 +11,9 @@ export interface Msg {
   noInfo?: boolean;
 }
 
-const sid = sessionStorage.getItem("sid") ?? crypto.randomUUID();
+// nanoid usa crypto.getRandomValues (disponible sobre HTTP), a diferencia de
+// crypto.randomUUID, que solo existe en contextos seguros (HTTPS/localhost).
+const sid = sessionStorage.getItem("sid") ?? nanoid();
 sessionStorage.setItem("sid", sid);
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

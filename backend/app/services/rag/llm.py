@@ -16,6 +16,9 @@ def get_chat_model() -> ChatOllama:
         base_url=s.ollama_base_url,
         temperature=s.llm_temperature,
         num_ctx=s.ollama_num_ctx,
+        # Desactiva el modo "thinking" de qwen3: para respuestas fundamentadas en el contexto
+        # no aporta y a veces devuelve solo <think> (respuesta vacía). Además reduce latencia.
+        reasoning=False,
     )
 
 

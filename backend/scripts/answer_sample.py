@@ -15,10 +15,11 @@ import sys
 from pathlib import Path
 
 from app.core.config import get_settings
-from app.services.rag.chain import answer_question
-from app.services.rag.embeddings import get_embeddings
-from app.services.rag.llm import get_chat_model
-from app.services.rag.vectorstore import get_client, get_vectorstore
+from app.infrastructure.memory.store import InProcessMemory
+from app.infrastructure.rag.chain import answer_question
+from app.infrastructure.rag.embeddings import get_embeddings
+from app.infrastructure.rag.llm import get_chat_model
+from app.infrastructure.rag.vectorstore import get_client, get_vectorstore
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -51,9 +52,10 @@ def main() -> None:
 
     llm = get_chat_model()
     vs = get_vectorstore(get_client(), get_embeddings())
+    memory = InProcessMemory()
 
     for i, c in enumerate(cases, 1):
-        res = answer_question(llm, vs, c["pregunta"], f"diag-{i}", c.get("areas"))
+        res = answer_question(llm, vs, memory, c["pregunta"], f"diag-{i}", c.get("areas"))
         print("=" * 88)
         print(f"P{i}: {c['pregunta']}")
         print(f"    esperado: {c.get('fuentes_esperadas')}  | no_info={res['no_info']}")

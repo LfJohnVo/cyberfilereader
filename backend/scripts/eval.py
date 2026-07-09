@@ -19,9 +19,9 @@ import sys
 from pathlib import Path
 
 from app.core.config import get_settings
-from app.services.rag.embeddings import get_embeddings
-from app.services.rag.retriever import build_filter, retrieve
-from app.services.rag.vectorstore import get_client, get_vectorstore
+from app.infrastructure.rag.embeddings import get_embeddings
+from app.infrastructure.rag.retriever import build_filter, retrieve
+from app.infrastructure.rag.vectorstore import get_client, get_vectorstore
 
 # Consolas Windows (cp1252) no codifican acentos/símbolos: forzamos UTF-8.
 try:

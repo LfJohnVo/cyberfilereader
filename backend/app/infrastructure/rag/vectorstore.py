@@ -12,7 +12,7 @@ from langchain_qdrant import QdrantVectorStore, RetrievalMode
 from qdrant_client import QdrantClient, models
 
 from app.core.config import get_settings
-from app.services.rag.embeddings import get_sparse_embeddings
+from app.infrastructure.rag.embeddings import get_sparse_embeddings
 
 log = logging.getLogger(__name__)
 _INDEXED_FIELDS = ["metadata.area", "metadata.estado", "metadata.source", "metadata.doc_type"]

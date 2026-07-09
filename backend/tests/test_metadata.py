@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.services.ingestion.metadata import infer_metadata
+from app.infrastructure.ingestion.metadata import infer_metadata
 
 
 def test_area_tipo_y_version():

@@ -10,10 +10,10 @@ import re
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.domain.models import Veredicto
-from app.services.rag.formatting import format_context
-from app.services.rag.llm import strip_reasoning
-from app.services.rag.prompts import COMPLIANCE_SYSTEM_PROMPT, COMPLIANCE_USER_TEMPLATE
-from app.services.rag.retriever import retrieve
+from app.infrastructure.rag.formatting import format_context
+from app.infrastructure.rag.llm import strip_reasoning
+from app.infrastructure.rag.prompts import COMPLIANCE_SYSTEM_PROMPT, COMPLIANCE_USER_TEMPLATE
+from app.infrastructure.rag.retriever import retrieve
 
 log = logging.getLogger(__name__)
 

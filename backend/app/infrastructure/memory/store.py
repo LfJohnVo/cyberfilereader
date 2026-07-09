@@ -41,10 +41,3 @@ class InProcessMemory:
 
     def clear(self, session_id: str) -> None:
         self._sessions.pop(session_id, None)
-
-
-# Instancia por defecto: expone el API a nivel de módulo (compat) hasta inyectarla por DI en C4.
-_default = InProcessMemory()
-get_history = _default.get_history
-append = _default.append
-clear = _default.clear

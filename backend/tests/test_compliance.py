@@ -1,4 +1,4 @@
-from app.services.rag.compliance import _verdict
+from app.infrastructure.rag.compliance import _verdict
 
 
 def test_verdict_cumple():

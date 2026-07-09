@@ -10,8 +10,8 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Uplo
 
 from app.api.deps import get_user_areas
 from app.core.config import get_settings
+from app.infrastructure.ingestion.loaders import load_file
 from app.schemas.compliance import ComplianceResponse
-from app.services.ingestion.loaders import load_file
 
 log = logging.getLogger(__name__)
 router = APIRouter()

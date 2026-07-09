@@ -12,10 +12,10 @@ from pathlib import Path
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.core.config import get_settings
-from app.services.ingestion.loaders import load_file
-from app.services.ingestion.metadata import infer_metadata
-from app.services.rag.embeddings import get_embeddings
-from app.services.rag.vectorstore import (
+from app.infrastructure.ingestion.loaders import load_file
+from app.infrastructure.ingestion.metadata import infer_metadata
+from app.infrastructure.rag.embeddings import get_embeddings
+from app.infrastructure.rag.vectorstore import (
     delete_by_source,
     ensure_collection,
     get_client,

@@ -11,7 +11,7 @@ from langchain_core.embeddings import Embeddings
 from qdrant_client import QdrantClient
 
 from app.core.config import get_settings
-from app.services.rag import vectorstore as vsmod
+from app.infrastructure.rag import vectorstore as vsmod
 
 DIM = 64
 

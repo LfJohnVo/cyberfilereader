@@ -19,12 +19,13 @@ from pathlib import Path
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.core.config import get_settings
-from app.services.rag.chain import answer_question
-from app.services.rag.embeddings import get_embeddings
-from app.services.rag.formatting import format_context
-from app.services.rag.llm import get_chat_model, strip_reasoning
-from app.services.rag.retriever import retrieve
-from app.services.rag.vectorstore import get_client, get_vectorstore
+from app.infrastructure.memory.store import InProcessMemory
+from app.infrastructure.rag.chain import answer_question
+from app.infrastructure.rag.embeddings import get_embeddings
+from app.infrastructure.rag.formatting import format_context
+from app.infrastructure.rag.llm import get_chat_model, strip_reasoning
+from app.infrastructure.rag.retriever import retrieve
+from app.infrastructure.rag.vectorstore import get_client, get_vectorstore
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")
@@ -82,12 +83,13 @@ def main() -> None:
 
     llm = get_chat_model()
     vs = get_vectorstore(get_client(), get_embeddings())
+    memory = InProcessMemory()
 
     scores: list[int] = []
     for i, c in enumerate(cases, 1):
         q, areas = c["pregunta"], c.get("areas")
         context, _ = format_context(retrieve(vs, q, areas))
-        answer = answer_question(llm, vs, q, f"faith-{i}", areas)["answer"]
+        answer = answer_question(llm, vs, memory, q, f"faith-{i}", areas)["answer"]
         raw = llm.invoke(
             [
                 SystemMessage(content=JUDGE_SYS),

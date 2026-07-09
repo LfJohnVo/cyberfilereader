@@ -1,6 +1,6 @@
 from qdrant_client import QdrantClient
 
-from app.services.ingestion import pipeline
+from app.infrastructure.ingestion import pipeline
 from tests.conftest import FakeEmbeddings
 
 

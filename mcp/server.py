@@ -28,27 +28,27 @@ mcp = FastMCP("SGI-Agent")
 
 @lru_cache(maxsize=1)
 def _vectorstore():
-    from app.services.rag.embeddings import get_embeddings
-    from app.services.rag.vectorstore import get_client, get_vectorstore
+    from app.infrastructure.rag.embeddings import get_embeddings
+    from app.infrastructure.rag.vectorstore import get_client, get_vectorstore
 
     return get_vectorstore(get_client(), get_embeddings())
 
 
 @lru_cache(maxsize=1)
 def _llm():
-    from app.services.rag.llm import get_chat_model
+    from app.infrastructure.rag.llm import get_chat_model
 
     return get_chat_model()
 
 
 def _evaluar_cumplimiento(texto: str, nombre: str, areas: list[str] | None) -> dict:
-    from app.services.rag.compliance import assess_compliance
+    from app.infrastructure.rag.compliance import assess_compliance
 
     return assess_compliance(_llm(), _vectorstore(), texto, nombre, areas)
 
 
 def buscar_docs(query: str, areas: list[str] | None = None) -> list[dict]:
-    from app.services.rag.retriever import retrieve
+    from app.infrastructure.rag.retriever import retrieve
 
     hits = retrieve(_vectorstore(), query, areas)
     return [
@@ -65,7 +65,7 @@ def buscar_docs(query: str, areas: list[str] | None = None) -> list[dict]:
 
 def estado_coleccion() -> dict:
     from app.core.config import get_settings
-    from app.services.rag.vectorstore import get_client
+    from app.infrastructure.rag.vectorstore import get_client
 
     s = get_settings()
     client = get_client()
@@ -99,7 +99,7 @@ def sgi_cumplimiento(ruta: str, areas: list[str] | None = None) -> dict:
     el área contra la que se evalúa (None = según permisos/todas)."""
     from pathlib import Path
 
-    from app.services.ingestion.loaders import load_file
+    from app.infrastructure.ingestion.loaders import load_file
 
     p = Path(ruta)
     if not p.is_file():

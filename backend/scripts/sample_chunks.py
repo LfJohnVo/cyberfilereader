@@ -12,7 +12,7 @@ import sys
 from qdrant_client import models
 
 from app.core.config import get_settings
-from app.services.rag.vectorstore import get_client
+from app.infrastructure.rag.vectorstore import get_client
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")

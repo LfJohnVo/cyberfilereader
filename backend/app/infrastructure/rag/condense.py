@@ -10,7 +10,7 @@ import re
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from app.services.rag.llm import strip_reasoning
+from app.infrastructure.rag.llm import strip_reasoning
 
 log = logging.getLogger(__name__)
 

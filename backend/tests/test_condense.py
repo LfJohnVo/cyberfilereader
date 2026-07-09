@@ -1,4 +1,4 @@
-from app.services.rag.condense import _looks_dependent, condense_query
+from app.infrastructure.rag.condense import _looks_dependent, condense_query
 
 
 class _FakeLLM:

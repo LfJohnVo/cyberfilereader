@@ -1,4 +1,4 @@
-from app.services.memory.store import InProcessMemory
+from app.infrastructure.memory.store import InProcessMemory
 
 
 def test_maxlen_por_sesion():

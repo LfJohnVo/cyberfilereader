@@ -11,10 +11,10 @@ from langchain.agents import create_agent
 from langchain_core.tools import tool
 
 from app.domain.models import Fuente
-from app.services.rag.compliance import assess_compliance
-from app.services.rag.formatting import to_source
-from app.services.rag.llm import strip_reasoning
-from app.services.rag.retriever import retrieve
+from app.infrastructure.rag.compliance import assess_compliance
+from app.infrastructure.rag.formatting import to_source
+from app.infrastructure.rag.llm import strip_reasoning
+from app.infrastructure.rag.retriever import retrieve
 
 log = logging.getLogger(__name__)
 

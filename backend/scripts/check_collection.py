@@ -13,8 +13,8 @@ import sys
 from collections import Counter
 
 from app.core.config import get_settings
-from app.services.rag.embeddings import get_embeddings
-from app.services.rag.vectorstore import get_client
+from app.infrastructure.rag.embeddings import get_embeddings
+from app.infrastructure.rag.vectorstore import get_client
 
 # Consolas Windows (cp1252) no codifican acentos/símbolos: forzamos UTF-8 y no reventamos.
 try:

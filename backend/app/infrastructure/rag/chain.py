@@ -10,18 +10,18 @@ import re
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
 from app.core.config import get_settings
-from app.services.memory import store as memory
-from app.services.rag.condense import condense_query
-from app.services.rag.crag import grade_context, rewrite_for_retry
-from app.services.rag.formatting import format_context
-from app.services.rag.llm import strip_reasoning
-from app.services.rag.prompts import (
+from app.domain.ports import MemoryPort
+from app.infrastructure.rag.condense import condense_query
+from app.infrastructure.rag.crag import grade_context, rewrite_for_retry
+from app.infrastructure.rag.formatting import format_context
+from app.infrastructure.rag.llm import strip_reasoning
+from app.infrastructure.rag.prompts import (
     GREETING_MESSAGE,
     NO_INFO_MESSAGE,
     SYSTEM_PROMPT,
     USER_TEMPLATE,
 )
-from app.services.rag.retriever import search
+from app.infrastructure.rag.retriever import search
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ def _is_greeting(text: str) -> bool:
 
 
 def answer_question(
-    llm, vectorstore, question: str, session_id: str, areas: list[str] | None
+    llm, vectorstore, memory: MemoryPort, question: str, session_id: str, areas: list[str] | None
 ) -> dict:
     # Saludo/cortesía: responde amablemente sin buscar en la documentación.
     if _is_greeting(question):

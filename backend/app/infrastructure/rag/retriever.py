@@ -53,7 +53,7 @@ def search(vectorstore, query: str, areas: list[str] | None) -> SearchResult:
         return SearchResult(hits=gated[: s.retriever_k], found=True)
     # Rerank: reordena los que ya pasaron el gate; su score sale ya normalizado (sigmoide 0-1).
     try:
-        from app.services.rag.reranker import rerank
+        from app.infrastructure.rag.reranker import rerank
 
         return SearchResult(hits=rerank(query, gated)[: s.retriever_k], found=True)
     except Exception:

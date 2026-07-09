@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 
-from app.services.rag.retriever import retrieve
+from app.infrastructure.rag.retriever import retrieve
 
 
 def _seed(vs):

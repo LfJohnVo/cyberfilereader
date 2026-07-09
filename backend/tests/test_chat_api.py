@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 import app.main as main_mod
-from app.services.rag.prompts import NO_INFO_MESSAGE
+from app.infrastructure.rag.prompts import NO_INFO_MESSAGE
 
 
 @pytest.fixture()

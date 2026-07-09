@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 
-from app.services.rag.crag import grade_context, rewrite_for_retry
+from app.infrastructure.rag.crag import grade_context, rewrite_for_retry
 
 
 class _FakeLLM:

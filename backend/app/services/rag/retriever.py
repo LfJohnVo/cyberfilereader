@@ -7,20 +7,14 @@ distintas (coseno / RRF / cross-encoder). `retrieve()` es un envoltorio de compa
 """
 
 import logging
-from dataclasses import dataclass
 
 from langchain_core.documents import Document
 from qdrant_client import models
 
 from app.core.config import get_settings
+from app.domain.models import SearchResult
 
 log = logging.getLogger(__name__)
-
-
-@dataclass
-class SearchResult:
-    hits: list[tuple[Document, float]]  # (doc, relevancia 0-1), ordenados de mayor a menor
-    found: bool  # False => nada suficientemente relevante -> NO_INFO
 
 
 def build_filter(areas: list[str] | None) -> models.Filter:

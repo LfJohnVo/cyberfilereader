@@ -49,7 +49,7 @@ def test_pregunta_con_contexto(mem_vectorstore):
     memory.clear("s2")
     r = answer_question(_FakeLLM("Son 15 dias [1]."), vs, "politica de vacaciones", "s2", ["RRHH"])
     assert r["no_info"] is False
-    assert r["sources"] and r["sources"][0]["file_name"] == "vac.pdf"
+    assert r["sources"] and r["sources"][0].file_name == "vac.pdf"
     assert len(memory.get_history("s2")) == 2  # se guardó pregunta + respuesta
 
 

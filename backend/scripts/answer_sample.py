@@ -59,7 +59,7 @@ def main() -> None:
         print(f"    esperado: {c.get('fuentes_esperadas')}  | no_info={res['no_info']}")
         print("-" * 88)
         print(res["answer"])
-        print("  · fuentes:", [s["file_name"] for s in res["sources"]])
+        print("  · fuentes:", [s.file_name for s in res["sources"]])
         print()
 
 

@@ -11,7 +11,6 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.api.deps import get_user_areas
 from app.schemas.chat import ChatRequest, ChatResponse
-from app.services.agent.graph import run_agent
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -21,9 +20,9 @@ router = APIRouter()
 async def agent(
     body: ChatRequest, request: Request, areas: list[str] | None = Depends(get_user_areas)
 ):
-    st = request.app.state
+    uc = request.app.state.container.ejecutar_agente
     try:
-        result = await asyncio.to_thread(run_agent, st.llm, st.vectorstore, body.message, areas)
+        result = await asyncio.to_thread(uc.execute, body.message, areas)
     except Exception:
         log.exception("Fallo en /agent")
         raise HTTPException(

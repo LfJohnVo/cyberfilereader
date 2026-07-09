@@ -6,6 +6,8 @@ compliance.py para no duplicar (ni divergir) el formato.
 
 from langchain_core.documents import Document
 
+from app.domain.models import Fuente
+
 
 def _ubicacion(m: dict) -> str:
     if m.get("page"):
@@ -15,23 +17,23 @@ def _ubicacion(m: dict) -> str:
     return ""
 
 
-def to_source(n: int, doc: Document, score: float) -> dict:
+def to_source(n: int, doc: Document, score: float) -> Fuente:
     m = doc.metadata
-    return {
-        "n": n,
-        "file_name": m.get("file_name", "?"),
-        "source": m.get("source", ""),
-        "area": m.get("area", "?"),
-        "doc_type": m.get("doc_type"),
-        "version": m.get("version"),
-        "page": m.get("page"),
-        "score": round(float(score), 3),
-        "snippet": doc.page_content[:220],
-    }
+    return Fuente(
+        n=n,
+        file_name=m.get("file_name", "?"),
+        source=m.get("source", ""),
+        area=m.get("area", "?"),
+        doc_type=m.get("doc_type"),
+        version=m.get("version"),
+        page=m.get("page"),
+        score=round(float(score), 3),
+        snippet=doc.page_content[:220],
+    )
 
 
-def format_context(hits: list[tuple[Document, float]]) -> tuple[str, list[dict]]:
-    """Devuelve (contexto numerado [n], lista de fuentes) para el prompt y la respuesta."""
+def format_context(hits: list[tuple[Document, float]]) -> tuple[str, list[Fuente]]:
+    """Devuelve (contexto numerado [n], lista de Fuente) para el prompt y la respuesta."""
     bloques, fuentes = [], []
     for n, (doc, score) in enumerate(hits, start=1):
         m = doc.metadata

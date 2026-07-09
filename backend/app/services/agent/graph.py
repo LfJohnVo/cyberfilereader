@@ -10,6 +10,7 @@ import logging
 from langchain.agents import create_agent
 from langchain_core.tools import tool
 
+from app.domain.models import Fuente
 from app.services.rag.compliance import assess_compliance
 from app.services.rag.formatting import to_source
 from app.services.rag.llm import strip_reasoning
@@ -31,7 +32,7 @@ _RECURSION_LIMIT = 8  # cota de pasos del agente (razona/llama-tool/observa)
 
 def run_agent(llm, vectorstore, question: str, areas: list[str] | None) -> dict:
     """Ejecuta el agente sobre una consulta y devuelve {answer, sources, no_info}."""
-    fuentes: list[dict] = []
+    fuentes: list[Fuente] = []
 
     @tool
     def buscar_documentos(consulta: str) -> str:
@@ -65,11 +66,11 @@ def run_agent(llm, vectorstore, question: str, areas: list[str] | None) -> dict:
     )
     answer = strip_reasoning(out["messages"][-1].content or "")
 
-    # Deduplica y renumera las fuentes acumuladas por todas las llamadas a las tools.
+    # Deduplica y renumera las Fuente acumuladas por todas las llamadas a las tools.
     vistos, dedup = set(), []
     for s in fuentes:
-        clave = (s.get("file_name"), s.get("snippet"))
+        clave = (s.file_name, s.snippet)
         if clave not in vistos:
             vistos.add(clave)
-            dedup.append({**s, "n": len(dedup) + 1})
+            dedup.append(s.model_copy(update={"n": len(dedup) + 1}))
     return {"answer": answer, "sources": dedup, "no_info": not dedup}

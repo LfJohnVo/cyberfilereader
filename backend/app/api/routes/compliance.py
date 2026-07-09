@@ -12,7 +12,6 @@ from app.api.deps import get_user_areas
 from app.core.config import get_settings
 from app.schemas.compliance import ComplianceResponse
 from app.services.ingestion.loaders import load_file
-from app.services.rag.compliance import assess_compliance
 
 log = logging.getLogger(__name__)
 router = APIRouter()
@@ -52,11 +51,9 @@ async def compliance(
         except OSError:
             pass
 
-    st = request.app.state
+    uc = request.app.state.container.evaluar_cumplimiento
     try:
-        result = await asyncio.to_thread(
-            assess_compliance, st.llm, st.vectorstore, text, file.filename, target
-        )
+        result = await asyncio.to_thread(uc.execute, text, file.filename, target)
     except Exception:
         log.exception("Fallo en /compliance")
         raise HTTPException(502, "El agente no pudo evaluar el cumplimiento.") from None

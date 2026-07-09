@@ -19,8 +19,9 @@ from pathlib import Path
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.core.config import get_settings
-from app.services.rag.chain import _format_context, answer_question
+from app.services.rag.chain import answer_question
 from app.services.rag.embeddings import get_embeddings
+from app.services.rag.formatting import format_context
 from app.services.rag.llm import get_chat_model, strip_reasoning
 from app.services.rag.retriever import retrieve
 from app.services.rag.vectorstore import get_client, get_vectorstore
@@ -85,7 +86,7 @@ def main() -> None:
     scores: list[int] = []
     for i, c in enumerate(cases, 1):
         q, areas = c["pregunta"], c.get("areas")
-        context, _ = _format_context(retrieve(vs, q, areas))
+        context, _ = format_context(retrieve(vs, q, areas))
         answer = answer_question(llm, vs, q, f"faith-{i}", areas)["answer"]
         raw = llm.invoke(
             [

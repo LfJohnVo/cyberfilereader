@@ -9,6 +9,7 @@ import re
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from app.services.rag.formatting import format_context
 from app.services.rag.llm import strip_reasoning
 from app.services.rag.prompts import COMPLIANCE_SYSTEM_PROMPT, COMPLIANCE_USER_TEMPLATE
 from app.services.rag.retriever import retrieve
@@ -54,29 +55,13 @@ def assess_compliance(
             "sources": [],
         }
 
-    bloques, fuentes = [], []
-    for n, (d, score) in enumerate(hits, start=1):
-        m = d.metadata
-        bloques.append(f"[{n}] ({m['file_name']} — área {m['area']})\n{d.page_content}")
-        fuentes.append(
-            {
-                "n": n,
-                "file_name": m["file_name"],
-                "source": m["source"],
-                "area": m["area"],
-                "doc_type": m.get("doc_type"),
-                "version": m.get("version"),
-                "page": m.get("page"),
-                "score": round(float(score), 3),
-                "snippet": d.page_content[:220],
-            }
-        )
+    requisitos, fuentes = format_context(hits)
 
     mensajes = [
         SystemMessage(content=COMPLIANCE_SYSTEM_PROMPT),
         HumanMessage(
             content=COMPLIANCE_USER_TEMPLATE.format(
-                requisitos="\n\n".join(bloques),
+                requisitos=requisitos,
                 nombre=doc_name,
                 documento=doc[:_MAX_DOC_CHARS],
             )

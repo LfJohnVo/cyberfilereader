@@ -57,6 +57,29 @@ def ensure_collection(client: QdrantClient, embed_dim: int) -> None:
             pass  # ya existe
 
 
+def assert_schema(client: QdrantClient, embed_dim: int) -> None:
+    """Falla rápido si la colección existente no coincide con el modelo/flags (dim, híbrido).
+
+    Evita la trampa silenciosa de embeder a 4096-dim contra una colección creada a 768-dim.
+    """
+    s = get_settings()
+    vectors = client.get_collection(s.qdrant_collection).config.params.vectors
+    if s.hybrid_enabled:
+        if not isinstance(vectors, dict) or _DENSE not in vectors:
+            raise RuntimeError(
+                f"HYBRID_ENABLED pero la colección '{s.qdrant_collection}' no tiene vectores "
+                "nombrados; recrea la colección y re-ingesta (python -m scripts.ingest --full)."
+            )
+        coll_dim = vectors[_DENSE].size
+    else:
+        coll_dim = getattr(vectors, "size", None)
+    if coll_dim is not None and coll_dim != embed_dim:
+        raise RuntimeError(
+            f"Dimensión de la colección ({coll_dim}) != modelo '{s.ollama_embed_model}' "
+            f"({embed_dim}). Recrea la colección y re-ingesta."
+        )
+
+
 def get_vectorstore(client: QdrantClient, embeddings) -> QdrantVectorStore:
     s = get_settings()
     if s.hybrid_enabled:

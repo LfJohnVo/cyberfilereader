@@ -19,6 +19,7 @@ def client(monkeypatch):
     monkeypatch.setattr(main_mod, "get_vectorstore", lambda c, e: object())
     monkeypatch.setattr(main_mod, "get_chat_model", lambda: object())
     monkeypatch.setattr(main_mod, "ensure_collection", lambda *a, **k: None)
+    monkeypatch.setattr(main_mod, "assert_schema", lambda *a, **k: None)
     with TestClient(main_mod.app) as c:  # el 'with' dispara el lifespan
         yield c
 

@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,9 +30,10 @@ class Settings(BaseSettings):
     hybrid_enabled: bool = False  # densa + BM25; requiere re-ingesta (vectores nombrados)
     sparse_model: str = "Qdrant/bm25"  # embedding disperso (léxico) para el modo híbrido
     condense_enabled: bool = True  # reformular la consulta con el historial (follow-ups)
+    crag_enabled: bool = False  # recuperación correctiva acotada (+1 evaluación LLM por consulta)
 
     ollama_base_url: str = "http://localhost:11434"
-    ollama_chat_model: str = "llama3.1:8b"
+    ollama_chat_model: str = "qwen3:8b"  # el modelo real se fija en .env (override)
     ollama_embed_model: str = "nomic-embed-text"
     ollama_num_ctx: int = 8192
     llm_temperature: float = 0.1
@@ -52,6 +54,12 @@ class Settings(BaseSettings):
     @property
     def extensions_set(self) -> set[str]:
         return {e.strip().lower() for e in self.allowed_extensions.split(",")}
+
+    @model_validator(mode="after")
+    def _coherencia_rag(self):
+        if self.rerank_enabled and self.rerank_candidates < self.retriever_k:
+            raise ValueError("RERANK_CANDIDATES debe ser >= RETRIEVER_K")
+        return self
 
 
 @lru_cache

@@ -9,12 +9,17 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app.api.routes import chat, compliance, documents, health, history, ingest
+from app.api.routes import agent, chat, compliance, documents, health, history, ingest
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.services.rag.embeddings import get_embeddings
 from app.services.rag.llm import get_chat_model
-from app.services.rag.vectorstore import ensure_collection, get_client, get_vectorstore
+from app.services.rag.vectorstore import (
+    assert_schema,
+    ensure_collection,
+    get_client,
+    get_vectorstore,
+)
 
 s = get_settings()
 setup_logging()
@@ -32,6 +37,7 @@ async def lifespan(app: FastAPI):
     try:
         dim = len(embeddings.embed_query("probe"))
         ensure_collection(client, dim)
+        assert_schema(client, dim)  # falla rápido ante dimensión/esquema incoherentes
     except Exception:
         log.exception(
             "No se pudo garantizar la colección Qdrant; "
@@ -57,5 +63,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-for r in (health, chat, ingest, documents, history, compliance):
+for r in (health, chat, agent, ingest, documents, history, compliance):
     app.include_router(r.router, prefix="/api")

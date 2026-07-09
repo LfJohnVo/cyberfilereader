@@ -77,6 +77,7 @@ Copia `.env.example` a `.env` y completa los valores reales.
 | `HYBRID_ENABLED` | `false` | Búsqueda híbrida densa+BM25 (RRF). Requiere re-ingestar la colección con vectores nombrados. |
 | `SPARSE_MODEL` | `Qdrant/bm25` | Modelo de embedding disperso (léxico) del modo híbrido. |
 | `CONDENSE_ENABLED` | `true` | Reformula preguntas de seguimiento con el historial para recuperar mejor. |
+| `CRAG_ENABLED` | `false` | Recuperación correctiva: evalúa el contexto y reintenta/`NO_INFO` si no basta (+1 llamada LLM). |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | URL de Ollama. En Docker: `http://host.docker.internal:11434`. |
 | `OLLAMA_CHAT_MODEL` | `qwen3:8b` | Modelo de chat. |
 | `OLLAMA_EMBED_MODEL` | `nomic-embed-text` | Modelo de embeddings. |
@@ -104,3 +105,26 @@ agentessgi/
 ├── docs/           # documentos de la empresa (solo lectura, no versionado)
 └── docs-proyecto/  # ADRs y planes
 ```
+
+## Servidor MCP (opcional)
+
+Expone la recuperación documental como herramientas [MCP](https://modelcontextprotocol.io),
+reutilizando el mismo `retriever` que el chat (embeddings Ollama + filtro por área/estado), para
+que un agente o cliente MCP (Cursor, el MCP Inspector u otros compatibles) consulte el SGI.
+
+```bash
+pip install -r mcp/requirements.txt
+python mcp/server.py                                # stdio (clientes locales)
+python mcp/server.py --transport http --port 8765   # red / agentes
+```
+
+Herramientas:
+- **`sgi_buscar(query, areas?)`** — busca en la documentación vigente y devuelve fragmentos con su
+  fuente. `areas` filtra por permiso (`null` / `["*"]` = acceso total).
+- **`sgi_cumplimiento(ruta, areas?)`** — evalúa si un documento (PDF, DOCX, TXT, MD, XLSX, CSV)
+  cumple con las normas del SGI/ISO: veredicto, informe con hallazgos y fuentes citadas.
+  `sgi_cumplimiento_texto(documento, nombre, areas?)` hace lo mismo con el texto ya extraído.
+- **`sgi_estado()`** — colección, nº de fragmentos y modelo de embeddings.
+
+> El transporte `http` no lleva autenticación: expónlo solo en una red de confianza o detrás de un
+> proxy con auth. El servidor lee `backend/.env` (mismos Qdrant/Ollama que la API).

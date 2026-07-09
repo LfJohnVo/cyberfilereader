@@ -3,9 +3,6 @@ import { isSpeaking } from "../../lib/tts";
 import { useAgentStore } from "../../stores/agentStore";
 import { STATUS_VISUALS } from "../statusVisuals";
 
-/** Avatar 2D (sin Three.js): anillo de estado + ecualizador SVG que reacciona al habla.
- *  Demuestra que el sistema admite avatares "dom" además de "webgl". El color/label salen del
- *  estado (re-render de React); la animación de barras va por rAF sobre refs (sin re-render). */
 const BARS = 40;
 
 export default function Onda() {

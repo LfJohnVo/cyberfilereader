@@ -1,10 +1,3 @@
-"""Agente con tools (LangGraph): orquesta búsqueda y cumplimiento sobre la documentación del SGI.
-
-Reutiliza `retrieve()` y `assess_compliance()`; el LLM decide qué herramienta usar y en qué orden
-(permite multi-salto). Acotado por `recursion_limit` para no bucear en un modelo local. Las tools
-llevan `areas` en el cierre, de modo que respetan el control de acceso por área/estado.
-"""
-
 import logging
 
 from langchain.agents import create_agent
@@ -27,11 +20,10 @@ _AGENT_PROMPT = (
     "fuentes con [n], y si no hay información suficiente dilo con claridad. No inventes. Español."
 )
 
-_RECURSION_LIMIT = 8  # cota de pasos del agente (razona/llama-tool/observa)
+_RECURSION_LIMIT = 8
 
 
 def run_agent(llm, vectorstore, question: str, areas: list[str] | None) -> dict:
-    """Ejecuta el agente sobre una consulta y devuelve {answer, sources, no_info}."""
     fuentes: list[Fuente] = []
 
     @tool

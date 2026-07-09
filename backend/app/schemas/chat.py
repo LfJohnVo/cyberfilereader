@@ -1,13 +1,8 @@
-"""Schemas Pydantic del chat (guidelines §5: contratos explícitos).
-
-El DTO de fuente ES el value object de dominio `Fuente` (presentación depende de dominio).
-"""
-
 from pydantic import BaseModel, Field
 
 from app.domain.models import Fuente
 
-Source = Fuente  # alias de compatibilidad
+Source = Fuente
 
 
 class ChatRequest(BaseModel):
@@ -19,5 +14,5 @@ class ChatResponse(BaseModel):
     answer: str
     sources: list[Fuente]
     no_info: bool
-    status: str  # estado final del agente: "idle" | "no_info" | "error"
+    status: str  # "idle" | "no_info" | "error"
     session_id: str

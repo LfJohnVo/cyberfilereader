@@ -5,8 +5,6 @@ import { isSpeaking } from "../../lib/tts";
 import { useAgentStore } from "../../stores/agentStore";
 import { STATUS_VISUALS, type AgentStatus } from "../statusVisuals";
 
-/** Orbe de plasma: núcleo incandescente + cascarón geodésico + halo aditivo + partículas que
- *  convergen al buscar y se expanden al responder. Estética más suave/orgánica que Nexus. */
 const PARTS = 320;
 
 export default function Orbe() {
@@ -50,8 +48,7 @@ export default function Orbe() {
     return { pGeo: g, dirs: d, radii: r };
   }, []);
 
-  // La geometría se pasa por prop (no como hijo JSX): R3F no la libera al desmontar. Al cambiar
-  // de avatar se desmonta este componente, así que liberamos el BufferGeometry (CPU + VBO GPU).
+  // Geometría por prop: R3F no la libera al desmontar, hay que hacerlo a mano.
   useEffect(() => () => pGeo.dispose(), [pGeo]);
 
   useFrame((state, dt) => {

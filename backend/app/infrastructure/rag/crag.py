@@ -1,10 +1,3 @@
-"""CRAG-lite: recuperación correctiva acotada.
-
-Evalúa si el contexto recuperado basta para responder; si no, reformula la consulta y
-reintenta UNA vez; si sigue sin bastar, se responde NO_INFO honesto en vez de arriesgar una
-respuesta pobre. Coste: +1 evaluación por consulta (y +1 reintento solo si la primera falla).
-"""
-
 import logging
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -26,7 +19,6 @@ _REWRITE_SYS = (
 
 
 def grade_context(llm, question: str, hits) -> bool:
-    """True si el contexto recuperado basta para responder la pregunta."""
     ctx = "\n\n".join(d.page_content[:600] for d, _ in hits[:5])
     prompt = f"PREGUNTA: {question}\n\nCONTEXTO:\n{ctx}\n\n¿Suficiente? (SI/NO):"
     try:
@@ -40,7 +32,6 @@ def grade_context(llm, question: str, hits) -> bool:
 
 
 def rewrite_for_retry(llm, question: str) -> str:
-    """Reescribe la consulta para un segundo intento de recuperación."""
     try:
         out = strip_reasoning(
             llm.invoke(

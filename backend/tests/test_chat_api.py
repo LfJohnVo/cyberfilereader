@@ -9,7 +9,6 @@ from app.infrastructure.rag.prompts import NO_INFO_MESSAGE
 
 @pytest.fixture()
 def container():
-    """Contenedor falso: cada test define el `execute` de su caso de uso."""
     return types.SimpleNamespace(
         client=object(),
         vectorstore=object(),
@@ -22,7 +21,6 @@ def container():
 
 @pytest.fixture()
 def client(monkeypatch, container):
-    # El composition root se sustituye por el contenedor falso (DI = punto de inyección de prueba).
     monkeypatch.setattr(main_mod, "build_container", lambda: container)
     with TestClient(main_mod.app) as c:  # el 'with' dispara el lifespan
         yield c

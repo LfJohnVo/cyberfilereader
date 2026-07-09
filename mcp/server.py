@@ -1,22 +1,9 @@
-"""Servidor MCP de SGI-Agent: expone la recuperación documental como herramientas (tools).
-
-Reutiliza el MISMO retriever que /chat (embeddings Ollama + filtro por área/estado + reranking),
-así respeta el control de acceso y no duplica lógica. Pensado para que agentes o clientes MCP
-(Cursor, el MCP Inspector u otros compatibles) consulten la documentación del SGI.
-
-Ejecutar (desde cualquier ruta; se posiciona solo en backend/ para leer backend/.env):
-    python mcp/server.py                                 # stdio (clientes locales)
-    python mcp/server.py --transport http --port 8765    # red / agentes
-
-Instalación: pip install -r mcp/requirements.txt
-"""
-
 import os
 import sys
 from functools import lru_cache
 from pathlib import Path
 
-# El servidor reutiliza el backend: nos posicionamos ahí para importar `app` y leer backend/.env.
+# Reutiliza el backend: cwd en backend/ para importar `app` y leer backend/.env.
 _BACKEND = Path(__file__).resolve().parents[1] / "backend"
 os.chdir(_BACKEND)
 sys.path.insert(0, str(_BACKEND))

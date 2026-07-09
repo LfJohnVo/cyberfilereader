@@ -1,10 +1,3 @@
-"""Reformulación de la consulta con el historial (follow-ups).
-
-Convierte un seguimiento dependiente del contexto ("¿y quién lo aprueba?") en una pregunta
-autónoma, SOLO para recuperar mejor; la generación sigue viendo el historial completo. Una
-heurística evita la llamada extra al LLM cuando la pregunta ya es autónoma.
-"""
-
 import logging
 import re
 
@@ -14,7 +7,6 @@ from app.infrastructure.rag.llm import strip_reasoning
 
 log = logging.getLogger(__name__)
 
-# Señales de dependencia del contexto previo (evita artículos comunes como "la/lo").
 _DEP_RE = re.compile(
     r"(^\s*¿?\s*y\s)|"
     r"\b(eso|esa|ese|esos|esas|aquel|aquella|aquello|ah[ií]|all[ií]|anterior|previa|previo|"
@@ -30,12 +22,10 @@ _SYS = (
 
 
 def _looks_dependent(q: str) -> bool:
-    """True si la pregunta parece depender del contexto previo (corta o con anáfora)."""
     return len(q.strip()) < 60 or bool(_DEP_RE.search(q))
 
 
 def condense_query(llm, history: list[tuple[str, str]], question: str) -> str:
-    """Devuelve una consulta autónoma para recuperar; la original si no hace falta reformular."""
     if not history or not _looks_dependent(question):
         return question
     hist = "\n".join(

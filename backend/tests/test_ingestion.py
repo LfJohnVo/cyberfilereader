@@ -5,7 +5,7 @@ from tests.conftest import FakeEmbeddings
 
 
 def _wire_inmemory(monkeypatch):
-    """La pipeline importó las factorías en su namespace: se parchean AHÍ."""
+    # La pipeline importó las factorías en su namespace: se parchean AHÍ.
     client = QdrantClient(":memory:")
     monkeypatch.setattr(pipeline, "get_embeddings", lambda: FakeEmbeddings())
     monkeypatch.setattr(pipeline, "get_client", lambda: client)
@@ -15,9 +15,9 @@ def _wire_inmemory(monkeypatch):
 def test_segunda_corrida_no_reindexa(docs_demo, monkeypatch):
     _wire_inmemory(monkeypatch)
     r1 = pipeline.run_ingestion()
-    r2 = pipeline.run_ingestion()  # nada cambió en disco
+    r2 = pipeline.run_ingestion()
     assert r1["indexados"] == 3 and r2["indexados"] == 0
-    assert r2["sin_cambios"] == 3  # mismos sha256 ⇒ skip
+    assert r2["sin_cambios"] == 3
 
 
 def test_modificar_un_archivo_solo_reindexa_ese(docs_demo, monkeypatch):

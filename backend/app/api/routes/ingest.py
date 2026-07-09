@@ -1,5 +1,3 @@
-"""Rutas de ingesta documental (POST /api/ingest, GET /api/ingest/status)."""
-
 import asyncio
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query

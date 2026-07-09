@@ -1,14 +1,3 @@
-"""Genera respuestas REALES del chain (retrieve + LLM) para diagnosticar la generación.
-
-Ejecuta el mismo camino que /chat sobre una muestra del set dorado e imprime pregunta,
-respuesta y fuentes, para revisar a ojo la calidad de la redacción y las citas.
-
-Uso (desde backend/, con el venv):
-    python -m scripts.answer_sample                 # muestra distribuida (6 casos)
-    python -m scripts.answer_sample --n 8
-    python -m scripts.answer_sample --ids sgi-001-mision,ens-002-codigo
-"""
-
 import argparse
 import json
 import sys
@@ -36,7 +25,7 @@ def _select(cases: list[dict], n: int, ids: str | None) -> list[dict]:
         return [c for c in cases if c.get("id") in wanted]
     if n >= len(cases):
         return cases
-    step = max(1, len(cases) // n)  # muestreo por saltos = variedad de áreas
+    step = max(1, len(cases) // n)
     return cases[::step][:n]
 
 

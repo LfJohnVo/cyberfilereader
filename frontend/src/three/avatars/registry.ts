@@ -1,8 +1,7 @@
 import { lazy } from "react";
 import type { AvatarDescriptor } from "./types";
 
-/** Registro de avatares. `lazy(import)` => cada avatar es un chunk aparte (code-splitting):
- *  el navegador solo descarga el que está seleccionado. Añadir uno = una línea aquí. */
+// `lazy(import)` => cada avatar es un chunk aparte (code-splitting).
 export const AVATARS: AvatarDescriptor[] = [
   { id: "nexus", label: "Núcleo Nexus", kind: "webgl", component: lazy(() => import("./NexusCore")) },
   { id: "orbe", label: "Orbe de plasma", kind: "webgl", component: lazy(() => import("./Orbe")) },

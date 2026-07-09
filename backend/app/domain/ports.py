@@ -1,8 +1,4 @@
-"""Puertos de la arquitectura hexagonal (interfaces).
-
-Los adaptadores de `infrastructure`/`services` los implementan; la capa de aplicación depende de
-estos contratos, no de Ollama/Qdrant concretos. `Document` se usa como contenedor de datos neutral.
-"""
+"""Puertos de la arquitectura hexagonal (interfaces)."""
 
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable

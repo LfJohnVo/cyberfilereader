@@ -1,5 +1,3 @@
-"""Factoría del chat model (Ollama vía init_chat_model). Único punto para cambiar de proveedor."""
-
 import re
 
 from langchain.chat_models import init_chat_model
@@ -18,14 +16,11 @@ def get_chat_model() -> BaseChatModel:
         base_url=s.ollama_base_url,
         temperature=s.llm_temperature,
         num_ctx=s.ollama_num_ctx,
-        # Timeout del cliente httpx subyacente: si Ollama se cuelga, invoke() lanza en vez de
-        # bloquear indefinidamente un worker de asyncio.to_thread (y agotar el pool).
         client_kwargs={"timeout": s.ollama_request_timeout},
-        # qwen3 es "thinking": desactivarlo evita respuestas vacías (solo <think>) y baja latencia.
+        # qwen3 es "thinking": desactivarlo evita respuestas vacías (solo <think>).
         reasoning=False,
     )
 
 
 def strip_reasoning(text: str) -> str:
-    """Elimina bloques de razonamiento <think>...</think> que algunos modelos emiten."""
     return _THINK_RE.sub("", text or "").strip()

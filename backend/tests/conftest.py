@@ -1,9 +1,3 @@
-"""Fixtures compartidas de prueba (sin red): FakeEmbeddings + Qdrant :memory:.
-
-Reglas (guidelines §13): ningún test toca Ollama ni Qdrant Cloud. El vector store
-usa el modo :memory: de qdrant-client y los embeddings un fake determinista.
-"""
-
 import hashlib
 
 import pytest
@@ -17,9 +11,6 @@ DIM = 64
 
 
 class FakeEmbeddings(Embeddings):
-    """Bolsa de palabras con hashing: textos que comparten palabras se parecen;
-    textos ajenos quedan casi ortogonales. Determinista, sin red."""
-
     def _vec(self, text: str) -> list[float]:
         v = [0.0] * DIM
         for tok in text.lower().split():
@@ -42,13 +33,13 @@ def settings_env(monkeypatch, tmp_path):
     data = tmp_path / "data"
     monkeypatch.setenv("DOCS_DIR", str(docs))
     monkeypatch.setenv("DATA_DIR", str(data))
-    monkeypatch.setenv("QDRANT_URL", "memory")  # nadie debe usarla en tests
+    monkeypatch.setenv("QDRANT_URL", "memory")
     monkeypatch.setenv("SCORE_THRESHOLD", "0.35")  # calibrado para FakeEmbeddings
     monkeypatch.setenv("RETRIEVER_K", "5")
     monkeypatch.setenv("RERANK_ENABLED", "false")  # sin red: el reranker descarga modelo
     monkeypatch.setenv("HYBRID_ENABLED", "false")  # sin red: BM25 descarga modelo
     monkeypatch.setenv("CRAG_ENABLED", "false")  # sin red: el grader llama al LLM
-    get_settings.cache_clear()  # Settings está cacheado con lru_cache
+    get_settings.cache_clear()
     yield docs
     get_settings.cache_clear()
 
@@ -62,7 +53,6 @@ def mem_vectorstore(settings_env):
 
 @pytest.fixture()
 def docs_demo(settings_env):
-    """Mini-corpus temporal: 2 áreas vigentes + 1 obsoleto."""
     (settings_env / "RRHH" / "Politicas").mkdir(parents=True)
     (settings_env / "Calidad" / "Procedimientos").mkdir(parents=True)
     (settings_env / "RRHH" / "Politicas" / "OBSOLETOS").mkdir()

@@ -1,5 +1,3 @@
-"""Schema de respuesta del chequeo de cumplimiento (guidelines §5)."""
-
 from pydantic import BaseModel
 
 from app.domain.models import Fuente, Veredicto

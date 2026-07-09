@@ -1,9 +1,3 @@
-"""Formateo compartido de fuentes y bloques de contexto (chat y cumplimiento).
-
-Fuente única del contrato Source y de los bloques numerados [n]; consumido por chain.py y
-compliance.py para no duplicar (ni divergir) el formato.
-"""
-
 from langchain_core.documents import Document
 
 from app.domain.models import Fuente
@@ -33,7 +27,6 @@ def to_source(n: int, doc: Document, score: float) -> Fuente:
 
 
 def format_context(hits: list[tuple[Document, float]]) -> tuple[str, list[Fuente]]:
-    """Devuelve (contexto numerado [n], lista de Fuente) para el prompt y la respuesta."""
     bloques, fuentes = [], []
     for n, (doc, score) in enumerate(hits, start=1):
         m = doc.metadata

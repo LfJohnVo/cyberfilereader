@@ -6,8 +6,6 @@ from app.infrastructure.rag.prompts import GREETING_MESSAGE, NO_INFO_MESSAGE
 
 
 class _FakeLLM:
-    """LLM de prueba: devuelve un texto fijo (no se usa en saludos ni NO_INFO)."""
-
     def __init__(self, out: str = "Respuesta [1]."):
         self.out = out
 
@@ -51,7 +49,7 @@ def test_pregunta_con_contexto(mem_vectorstore):
     )
     assert r["no_info"] is False
     assert r["sources"] and r["sources"][0].file_name == "vac.pdf"
-    assert len(mem.get_history("s2")) == 2  # se guardó pregunta + respuesta
+    assert len(mem.get_history("s2")) == 2
 
 
 def test_sin_cobertura_no_info(mem_vectorstore):

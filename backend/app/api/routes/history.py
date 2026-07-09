@@ -1,5 +1,3 @@
-"""Rutas de historial de sesión (usan la memoria inyectada en el contenedor)."""
-
 from fastapi import APIRouter, Request
 
 router = APIRouter()

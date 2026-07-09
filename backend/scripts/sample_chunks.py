@@ -1,11 +1,4 @@
-"""Muestra el fragmento más sustancioso de cada documento VIGENTE.
-
-Ayuda a construir el set dorado (backend/tests/eval/golden.json) con preguntas ancladas al
-contenido real y su fuente verificada. Solo lectura.
-
-Uso (desde backend/, con el venv):
-    python -m scripts.sample_chunks
-"""
+# Solo lectura sobre Qdrant.
 
 import sys
 
@@ -31,7 +24,7 @@ def main() -> None:
         ]
     )
 
-    best: dict[str, tuple[str, str]] = {}  # file_name -> (area, contenido más largo)
+    best: dict[str, tuple[str, str]] = {}
     offset = None
     while True:
         points, offset = client.scroll(

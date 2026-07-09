@@ -1,15 +1,3 @@
-"""Juez LLM de fidelidad: ¿la respuesta se apoya en el contexto recuperado, sin inventar?
-
-Para cada caso del set dorado: recupera contexto, genera la respuesta (mismo camino que
-/chat) y un LLM juez puntúa la fidelidad 1-5. Da un número de calidad para vigilar en cada
-cambio. Requiere Ollama + Qdrant.
-
-Uso (desde backend/, con el venv):
-    python -m scripts.eval_faithfulness            # muestra de 8 casos
-    python -m scripts.eval_faithfulness --n 28     # todos
-    python -m scripts.eval_faithfulness --ids sgi-001-mision,ens-002-codigo
-"""
-
 import argparse
 import json
 import re

@@ -6,8 +6,6 @@ import { useSettingsStore } from "../stores/settingsStore";
 import { avatarById } from "./avatars/registry";
 import { STATUS_VISUALS } from "./statusVisuals";
 
-/** Terreno low-poly wireframe animado, con nodos brillantes en los vértices.
- *  Color reactivo al estado del agente (cambia en tiempo real). */
 function Terrain() {
   const geo = useMemo(() => new THREE.PlaneGeometry(34, 20, 56, 34), []);
   const base = useMemo(() => Float32Array.from(geo.attributes.position.array as Float32Array), [geo]);
@@ -55,7 +53,6 @@ function Terrain() {
   );
 }
 
-/** Campo de partículas de fondo con color reactivo. */
 function ParticleField() {
   const grp = useRef<THREE.Points>(null!);
   const mat = useRef<THREE.PointsMaterial>(null!);
@@ -89,8 +86,6 @@ function ParticleField() {
   );
 }
 
-/** Detección de WebGL: si el navegador/GPU no lo soporta, evitamos montar el Canvas
- *  (que lanzaría) y devolvemos un fondo estático. La app sigue 100% usable. */
 function webglAvailable(): boolean {
   try {
     const canvas = document.createElement("canvas");
@@ -108,7 +103,6 @@ export default function Scene() {
   const desc = avatarById(avatarId);
   const Avatar = desc.component;
 
-  // Avatar 2D (sin Three.js): se monta sin <Canvas>.
   if (desc.kind === "dom") {
     return (
       <Suspense fallback={null}>
@@ -117,8 +111,7 @@ export default function Scene() {
     );
   }
 
-  // Avatar 3D: dentro del <Canvas> compartido (con el fondo de terreno + partículas).
-  if (!webglAvailable()) return null; // el degradado de fondo (CSS body) hace de respaldo
+  if (!webglAvailable()) return null;
 
   return (
     <Canvas

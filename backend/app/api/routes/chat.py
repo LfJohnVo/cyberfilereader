@@ -1,5 +1,3 @@
-"""Ruta POST /api/chat."""
-
 import asyncio
 import logging
 

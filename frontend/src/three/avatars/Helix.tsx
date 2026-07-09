@@ -5,9 +5,7 @@ import { isSpeaking } from "../../lib/tts";
 import { useAgentStore } from "../../stores/agentStore";
 import { STATUS_VISUALS, type AgentStatus } from "../statusVisuals";
 
-/** Hélice de datos: doble hélice de nodos (estilo ADN) que gira; los nodos laten al responder y
- *  la velocidad de giro sube con el estado. InstancedMesh + cero allocations en useFrame. */
-const N = 28; // nodos por hebra
+const N = 28;
 const TURNS = 3;
 const H = 4.6;
 const R = 1.05;
@@ -26,7 +24,7 @@ export default function Helix() {
     return rec;
   }, []);
 
-  // Posiciones base de las 2 hebras (2*N instancias), desfasadas 180°.
+  // Dos hebras (2*N instancias) desfasadas 180°.
   const base = useMemo(() => {
     const arr: [number, number, number][] = [];
     for (let s = 0; s < 2; s++) {

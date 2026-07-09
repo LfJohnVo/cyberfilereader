@@ -1,18 +1,3 @@
-"""Evaluación de la recuperación — Fase 0 del plan de evolución RAG.
-
-Mide la calidad de la recuperación con el MISMO camino que usa /chat (retriever.build_filter
-+ búsqueda semántica), para tener un baseline antes de tocar reranking/híbrido, y para
-recalibrar el umbral de score tras el cambio de modelo de embeddings.
-
-Set dorado: backend/tests/eval/golden.json  (ver tests/eval/README.md).
-Requiere Ollama + Qdrant alcanzables.
-
-Uso (desde backend/, con el venv activo):
-    python -m scripts.eval                 # métricas con la config actual (k, umbral)
-    python -m scripts.eval --candidates 20 # nº de candidatos a recuperar por pregunta
-    python -m scripts.eval --sweep         # barrido de umbral para recalibrarlo
-"""
-
 import argparse
 import json
 import sys
@@ -23,7 +8,7 @@ from app.infrastructure.rag.embeddings import get_embeddings
 from app.infrastructure.rag.retriever import build_filter, retrieve
 from app.infrastructure.rag.vectorstore import get_client, get_vectorstore
 
-# Consolas Windows (cp1252) no codifican acentos/símbolos: forzamos UTF-8.
+# Consola Windows (cp1252) no codifica acentos: forzamos UTF-8.
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:  # noqa: BLE001
@@ -44,7 +29,7 @@ def _relevant(doc, expected: set[str]) -> bool:
 
 
 def _search_all(vs, cases: list[dict], candidates: int) -> list[tuple[dict, list]]:
-    """Recupera candidatos SIN umbral (lo aplicamos en el análisis) una sola vez por caso."""
+    # Sin umbral aquí; se aplica en el análisis.
     out = []
     for c in cases:
         hits = vs.similarity_search_with_score(
@@ -86,7 +71,7 @@ def _report_sweep(per_case: list[tuple[dict, list]], k: int) -> None:
         n = len(per_case)
         recall = recall_hits / n
         precision = (kept_rel / kept_total) if kept_total else 0.0
-        # Heurística de "mejor umbral": prioriza recall, desempata por precisión.
+        # Prioriza recall, desempata por precisión.
         score = recall + precision * 0.25
         if score > best[1]:
             best = (thr, score)
@@ -95,7 +80,7 @@ def _report_sweep(per_case: list[tuple[dict, list]], k: int) -> None:
 
 
 def _report_pipeline(vs, cases: list[dict], s) -> None:
-    """Evalúa el camino REAL de /chat (retrieve: umbral + reranking + top-k)."""
+    # Camino real de /chat (retrieve: umbral + reranking + top-k).
     hit, mrr_sum = 0, 0.0
     for c in cases:
         docs = retrieve(vs, c["pregunta"], c.get("areas"))

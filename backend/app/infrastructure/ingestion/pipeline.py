@@ -1,9 +1,3 @@
-"""Recorre DOCS_DIR, indexa lo nuevo/modificado y elimina lo borrado (idempotente).
-
-Idempotencia: manifest.json guarda sha256 por ruta; mismo hash ⇒ skip.
-Reindexación: hash distinto ⇒ delete_by_source + re-add (nunca duplica).
-"""
-
 import json
 import logging
 import time
@@ -63,11 +57,10 @@ def run_ingestion(full: bool = False) -> dict:
 
     t0 = time.time()
     embeddings = get_embeddings()
-    dim = len(embeddings.embed_query("probe"))  # 768 con nomic-embed-text
+    dim = len(embeddings.embed_query("probe"))
     client = get_client()
     ensure_collection(client, dim)
-    # Falla rápido ANTES de borrar/insertar si la colección existente no coincide con el modelo
-    # (p. ej. embeder a 4096-dim contra una colección creada a 768-dim): evita vaciar documentos.
+    # Falla rápido antes de borrar/insertar si la colección no coincide con el modelo
     assert_schema(client, dim)
     vs = get_vectorstore(client, embeddings)
     splitter = RecursiveCharacterTextSplitter(
@@ -108,11 +101,10 @@ def run_ingestion(full: bool = False) -> dict:
                 resumen["indexados"] += 1
                 resumen["chunks"] += len(chunks)
                 log.info("Indexado %s (%d chunks, estado=%s)", rel, len(chunks), meta["estado"])
-            else:  # carga pero no extrae texto (¿escaneo sin OCR / archivo vacío?)
+            else:
                 resumen["vacios"].append(rel)
                 log.warning("Sin chunks (¿escaneo/vacío?): %s", rel)
-            # El manifest se actualiza siempre (incluso con 0 chunks) para no recargar en balde;
-            # los vacíos quedan visibles en resumen["vacios"] en vez de contarse como indexados.
+            # Se actualiza siempre (incluso con 0 chunks) para no recargar en balde
             manifest[rel] = {
                 "sha256": digest,
                 "chunks": len(chunks),

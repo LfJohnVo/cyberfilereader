@@ -16,14 +16,13 @@ export default function App() {
 
   return (
     <div className="scanlines relative h-screen w-screen overflow-hidden text-cyan-100">
-      {/* fondo 3D reactivo (si WebGL falla, el degradado de fondo hace de respaldo) */}
+      {/* si WebGL falla, el degradado de fondo hace de respaldo */}
       <div className="absolute inset-0">
         <ErrorBoundary label="scene" fallback={null}>
           <Scene />
         </ErrorBoundary>
       </div>
 
-      {/* barra superior */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-3 font-mono">
         <span className="glow text-sm tracking-[0.3em] text-cyan-300 md:text-base">
           SGI-AGENT <span className="text-fuchsia-400/80">// ASISTENTE CIBERNÉTICA</span>
@@ -37,7 +36,6 @@ export default function App() {
         </span>
       </header>
 
-      {/* paneles laterales */}
       <div className="absolute left-4 top-16 z-20 space-y-3">
         <AgentStatusPanel />
         <AvatarPicker />
@@ -48,7 +46,6 @@ export default function App() {
         <SourcesPanel />
       </div>
 
-      {/* consola inferior (el panel del chat aporta su propio fondo sólido) */}
       <div className="absolute inset-x-0 bottom-0 z-20 h-[34vh] px-5 pb-4 pt-2">
         <div className="mx-auto h-full max-w-[1400px]">
           <ChatPanel />

@@ -1,9 +1,3 @@
-"""Orquesta: memoria → retrieve (filtrado) → prompt con fuentes numeradas → LLM.
-
-Devuelve respuesta + fuentes estructuradas + bandera no_info. Función síncrona a
-propósito: las rutas la ejecutan con asyncio.to_thread para no bloquear el event loop.
-"""
-
 import logging
 import re
 
@@ -25,7 +19,6 @@ from app.infrastructure.rag.retriever import search
 
 log = logging.getLogger(__name__)
 
-# Saludos/cortesía: se responden de forma conversacional (no disparan RAG ni NO_INFO).
 _GREETING_RE = re.compile(
     r"^\s*(hola+|holi|buen[oa]s?(\s+(d[ií]as|tardes|noches))?|qu[eé]\s+tal|q'?\s?onda|"
     r"hey+|hi+|hello|saludos|buenas)\b",
@@ -41,13 +34,11 @@ def _is_greeting(text: str) -> bool:
 def answer_question(
     llm, vectorstore, memory: MemoryPort, question: str, session_id: str, areas: list[str] | None
 ) -> dict:
-    # Saludo/cortesía: responde amablemente sin buscar en la documentación.
     if _is_greeting(question):
         memory.append(session_id, "user", question)
         memory.append(session_id, "assistant", GREETING_MESSAGE)
         return {"answer": GREETING_MESSAGE, "sources": [], "no_info": False}
 
-    # Reformula follow-ups con el historial para recuperar mejor (la generación ve el historial).
     history = memory.get_history(session_id)
     search_q = question
     if get_settings().condense_enabled:
@@ -57,7 +48,7 @@ def answer_question(
 
     hits = search(vectorstore, search_q, areas).hits
 
-    # CRAG-lite: el grader juzga con search_q (la consulta que recuperó los hits), no la cruda.
+    # El grader juzga con search_q (la consulta que recuperó los hits), no la cruda.
     if get_settings().crag_enabled and hits and not grade_context(llm, search_q, hits):
         alt_q = rewrite_for_retry(llm, search_q)
         alt_hits = search(vectorstore, alt_q, areas).hits

@@ -1,5 +1,3 @@
-"""Rutas de documentos y áreas indexadas (leen el manifiesto de ingesta)."""
-
 import json
 from pathlib import Path
 

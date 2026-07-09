@@ -1,11 +1,3 @@
-"""Cliente Qdrant compartido, creación idempotente de colección e índices de payload.
-
-Soporta dos modos:
-- Denso (por defecto): un vector denso sin nombre.
-- Híbrido (HYBRID_ENABLED=true): vectores nombrados "dense" (Ollama) + "sparse" (BM25),
-  fusionados con RRF. Requiere re-ingestar en una colección con este esquema.
-"""
-
 import logging
 
 from langchain_qdrant import QdrantVectorStore, RetrievalMode
@@ -16,7 +8,7 @@ from app.infrastructure.rag.embeddings import get_sparse_embeddings
 
 log = logging.getLogger(__name__)
 _INDEXED_FIELDS = ["metadata.area", "metadata.estado", "metadata.source", "metadata.doc_type"]
-_DENSE, _SPARSE = "dense", "sparse"  # nombres de vectores en modo híbrido
+_DENSE, _SPARSE = "dense", "sparse"
 
 
 def get_client() -> QdrantClient:
@@ -46,7 +38,7 @@ def ensure_collection(client: QdrantClient, embed_dim: int) -> None:
             embed_dim,
             s.hybrid_enabled,
         )
-    for field in _INDEXED_FIELDS:  # necesarios para filtrar por área/estado en Cloud
+    for field in _INDEXED_FIELDS:
         try:
             client.create_payload_index(
                 s.qdrant_collection,
@@ -58,10 +50,6 @@ def ensure_collection(client: QdrantClient, embed_dim: int) -> None:
 
 
 def assert_schema(client: QdrantClient, embed_dim: int) -> None:
-    """Falla rápido si la colección existente no coincide con el modelo/flags (dim, híbrido).
-
-    Evita la trampa silenciosa de embeder a 4096-dim contra una colección creada a 768-dim.
-    """
     s = get_settings()
     vectors = client.get_collection(s.qdrant_collection).config.params.vectors
     if s.hybrid_enabled:

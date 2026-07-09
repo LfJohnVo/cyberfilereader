@@ -24,7 +24,7 @@ def test_archivo_suelto_en_raiz():
 
 
 def test_version_con_espacio_guion_y_mayuscula():
-    # Nombres reales del corpus: " v8", "_V3", "-v.1", "V.3"
+    # Formatos reales del corpus: " v8", "_V3", "-v.1", "V.3"
     assert infer_metadata(Path("Talento/M-GET-012 Manual v8.pdf"), 0)["version"] == "8"
     assert infer_metadata(Path("Auto/M-AUT-001 Seguridad_V3.pdf"), 0)["version"] == "3"
     assert infer_metadata(Path("Cib/M-SGI-008-Metodologia BIA-v.1.pdf"), 0)["version"] == "1"

@@ -1,5 +1,3 @@
-"""Única fuente de configuración. Nadie más lee variables de entorno (guidelines §4.3)."""
-
 from functools import lru_cache
 
 from pydantic import model_validator
@@ -18,34 +16,34 @@ class Settings(BaseSettings):
     docs_dir: str = "./docs"
     data_dir: str = "./data"
     allowed_extensions: str = ".pdf,.docx,.txt,.md,.xlsx,.csv"
-    max_file_mb: int = 25  # tope del archivo COMPRIMIDO recibido
-    max_uncompressed_mb: int = 150  # tope DESCOMPRIMIDO de .docx/.xlsx (anti zip-bomb)
+    max_file_mb: int = 25
+    max_uncompressed_mb: int = 150  # tope descomprimido de .docx/.xlsx (anti zip-bomb)
 
     chunk_size: int = 1000
     chunk_overlap: int = 150
     retriever_k: int = 5
-    score_threshold: float = 0.50  # recalibrar por modelo de embeddings (ver tests/eval)
-    rerank_enabled: bool = False  # activar tras validar mejora en el set dorado
+    score_threshold: float = 0.50
+    rerank_enabled: bool = False
     rerank_model: str = "jinaai/jina-reranker-v2-base-multilingual"
-    rerank_candidates: int = 20  # candidatos densos que reordena el cross-encoder
-    hybrid_enabled: bool = False  # densa + BM25; requiere re-ingesta (vectores nombrados)
-    sparse_model: str = "Qdrant/bm25"  # embedding disperso (léxico) para el modo híbrido
-    condense_enabled: bool = True  # reformular la consulta con el historial (follow-ups)
-    crag_enabled: bool = False  # recuperación correctiva acotada (+1 evaluación LLM por consulta)
+    rerank_candidates: int = 20
+    hybrid_enabled: bool = False  # requiere re-ingesta (vectores nombrados)
+    sparse_model: str = "Qdrant/bm25"
+    condense_enabled: bool = True
+    crag_enabled: bool = False
 
     ollama_base_url: str = "http://localhost:11434"
-    ollama_chat_model: str = "qwen3:8b"  # el modelo real se fija en .env (override)
+    ollama_chat_model: str = "qwen3:8b"
     ollama_embed_model: str = "nomic-embed-text"
     ollama_num_ctx: int = 8192
-    ollama_request_timeout: float = 120.0  # s; corta invocaciones colgadas (evita agotar el pool)
+    ollama_request_timeout: float = 120.0
     llm_temperature: float = 0.1
 
     qdrant_url: str = ""
     qdrant_api_key: str = ""
     qdrant_collection: str = "sgi_docs"
 
-    database_url: str = ""  # prod
-    redis_url: str = ""  # prod
+    database_url: str = ""
+    redis_url: str = ""
     jwt_secret: str = "dev-only"
     jwt_expire_minutes: int = 480
 

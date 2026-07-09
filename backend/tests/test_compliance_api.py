@@ -1,5 +1,4 @@
-"""Autorización por área en POST /api/compliance: el campo `areas` del formulario puede ACOTAR
-a un subconjunto de los permisos del usuario, nunca ampliarlos (regresión del bypass de filtro)."""
+# `areas` solo acota a un subconjunto de los permisos del usuario, nunca los amplía.
 
 import types
 
@@ -26,7 +25,7 @@ def container():
 @pytest.fixture()
 def client(monkeypatch, container):
     monkeypatch.setattr(main_mod, "build_container", lambda: container)
-    with TestClient(main_mod.app) as c:  # el 'with' dispara el lifespan
+    with TestClient(main_mod.app) as c:
         yield c
 
 
@@ -41,7 +40,6 @@ def _upload(client, areas: str, user_areas: str, spy):
 
 
 def test_rechaza_area_no_autorizada(client):
-    """Usuario de 'Calidad' pide 'Direccion' -> 403 y NO se evalúa nada."""
     llamado = {"target": "no-llamado"}
 
     def spy(text, name, target):
@@ -54,7 +52,6 @@ def test_rechaza_area_no_autorizada(client):
 
 
 def test_acota_a_subconjunto_permitido(client):
-    """Usuario de 'Calidad,RRHH' pide 'Calidad' -> 200 y evalúa solo sobre ['Calidad']."""
     capt = {}
 
     def spy(text, name, target):
@@ -67,7 +64,6 @@ def test_acota_a_subconjunto_permitido(client):
 
 
 def test_perfil_total_puede_pedir_cualquier_area(client):
-    """Perfil '*' (acceso total) sí puede acotar a un área arbitraria -> 200."""
     capt = {}
 
     def spy(text, name, target):

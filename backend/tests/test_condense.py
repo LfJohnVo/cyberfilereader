@@ -2,8 +2,6 @@ from app.infrastructure.rag.condense import _looks_dependent, condense_query
 
 
 class _FakeLLM:
-    """LLM de prueba: cuenta llamadas y devuelve un texto fijo."""
-
     def __init__(self, out: str = "REFORMULADA"):
         self.out = out
         self.calls = 0
@@ -20,7 +18,7 @@ class _FakeLLM:
 def test_sin_historial_no_reformula():
     llm = _FakeLLM()
     assert condense_query(llm, [], "¿y quién lo aprueba?") == "¿y quién lo aprueba?"
-    assert llm.calls == 0  # sin historial no gasta LLM
+    assert llm.calls == 0
 
 
 def test_pregunta_autonoma_larga_no_reformula():
@@ -28,7 +26,7 @@ def test_pregunta_autonoma_larga_no_reformula():
     q = "¿Cuáles son los tipos de escaneo de vulnerabilidades que se emplean en la metodología?"
     hist = [("user", "hola"), ("assistant", "hola")]
     assert condense_query(llm, hist, q) == q
-    assert llm.calls == 0  # autónoma y larga: no reformula (cero latencia extra)
+    assert llm.calls == 0
 
 
 def test_followup_dependiente_reformula():
@@ -49,8 +47,8 @@ def test_fallback_si_llm_falla():
 
 
 def test_looks_dependent():
-    assert _looks_dependent("¿y quién?")  # corta
-    assert _looks_dependent("¿eso incluye las copias de seguridad diarias del sistema?")  # anáfora
+    assert _looks_dependent("¿y quién?")
+    assert _looks_dependent("¿eso incluye las copias de seguridad diarias del sistema?")
     assert not _looks_dependent(
         "¿Qué controles de seguridad se aplican al instalar el sistema operativo en un equipo?"
     )

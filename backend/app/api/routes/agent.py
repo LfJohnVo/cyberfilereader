@@ -1,9 +1,3 @@
-"""Ruta POST /api/agent: orquestador con tools (búsqueda + cumplimiento).
-
-Complementa a /chat (respuesta directa de un salto): el agente decide qué herramientas usar y
-permite multi-salto. Más lento (varias llamadas al LLM), por eso es un endpoint aparte.
-"""
-
 import asyncio
 import logging
 

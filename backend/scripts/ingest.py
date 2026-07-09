@@ -1,5 +1,3 @@
-"""CLI de ingesta: python -m scripts.ingest [--full]."""
-
 import argparse
 import json
 import logging

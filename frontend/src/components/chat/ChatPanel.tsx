@@ -22,12 +22,10 @@ export default function ChatPanel() {
 
   return (
     <div className="flex h-full flex-col font-mono">
-      {/* pestaña de la consola */}
       <div className="clip-hud pointer-events-auto mb-1.5 inline-flex w-fit items-center gap-2 border border-cyan-400/60 bg-[rgba(4,8,18,0.92)] px-3 py-1 text-[11px] tracking-[0.2em] text-cyan-200">
         ▧ [SGI-AGENT &gt;]
       </div>
 
-      {/* panel sólido: marco neón biselado + fondo casi opaco para legibilidad */}
       <div className="clip-hud console-frame pointer-events-auto min-h-0 flex-1">
         <div className="clip-hud console-panel flex h-full flex-col px-4 py-3 md:px-6 md:py-4">
           <div className="chat-text min-h-0 flex-1 space-y-2 overflow-y-auto pr-2 text-sm leading-relaxed md:text-base">

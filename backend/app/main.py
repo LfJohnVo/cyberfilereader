@@ -1,5 +1,3 @@
-"""Punto de entrada de la API SGI-Agent: lifespan, CORS, rate limiting y routers."""
-
 import logging
 from contextlib import asynccontextmanager
 
@@ -22,7 +20,6 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Toda la construcción de adaptadores + casos de uso vive en el composition root.
     try:
         container = build_container()
     except Exception:

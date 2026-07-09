@@ -1,5 +1,3 @@
-"""Fuente única del comportamiento del agente (guidelines §7)."""
-
 NO_INFO_MESSAGE = (
     "No encontré información suficiente en la documentación indexada para responder "
     "esta pregunta con confianza. Puede que el documento no exista, no esté vigente, "

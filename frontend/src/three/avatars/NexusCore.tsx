@@ -5,21 +5,6 @@ import { isSpeaking } from "../../lib/tts";
 import { useAgentStore } from "../../stores/agentStore";
 import { STATUS_VISUALS, type AgentStatus } from "../statusVisuals";
 
-/**
- * NexusCore — núcleo de IA futurista, 100% procedural (Three.js), que "actúa" según el
- * estado del agente:
- *   idle       → gira lento y respira
- *   listening  → se activa hacia el usuario
- *   thinking   → el icosaedro interno acelera su giro
- *   searching  → las partículas CONVERGEN hacia el núcleo (investigando datos)
- *   answering  → el anillo ecualizador se enciende y pulsa; las partículas se expanden
- *   no_info    → se apaga/atenúa
- *   error      → tiembla en rojo
- * Todo lerp-ea su color hacia STATUS_VISUALS[status].color en tiempo real.
- *
- * Rendimiento: geometrías/objetos memorizados, instancedMesh para el ecualizador, y
- * cero allocations dentro de useFrame (colores precalculados por estado).
- */
 const TICKS = 64;
 const PARTICLES = 460;
 
@@ -46,7 +31,6 @@ export default function NexusCore() {
     return rec;
   }, []);
 
-  // Partículas: dirección unitaria fija + radio base (se anima el radio para converger/expandir).
   const { pGeo, dirs, radii } = useMemo(() => {
     const pos = new Float32Array(PARTICLES * 3);
     const d = new Float32Array(PARTICLES * 3);
@@ -72,8 +56,7 @@ export default function NexusCore() {
     return { pGeo: g, dirs: d, radii: r };
   }, []);
 
-  // La geometría se pasa por prop (no como hijo JSX), así que R3F no la libera al desmontar.
-  // Al cambiar de avatar se desmonta este componente: liberamos el BufferGeometry (CPU + VBO GPU).
+  // La geometría va por prop, no como hijo JSX: R3F no la libera, hay que hacerlo al desmontar.
   useEffect(() => () => pGeo.dispose(), [pGeo]);
 
   useLayoutEffect(() => {
@@ -97,7 +80,6 @@ export default function NexusCore() {
     color.current.lerp(statusColors[status], 0.06);
     const c = color.current;
 
-    // Rotaciones (velocidad según el estado).
     const spd = v.speed;
     ico.current.rotation.y += dt * (0.3 + spd * 0.9);
     ico.current.rotation.x += dt * 0.12;
@@ -109,12 +91,10 @@ export default function NexusCore() {
     points.current.rotation.y += dt * (0.06 + spd * 0.2);
     root.current.rotation.y = Math.sin(t * 0.2) * 0.12;
 
-    // Pulso del núcleo (respira; late al hablar).
     const p = 0.9 + Math.sin(t * (active ? 8 : 2.4)) * (active ? 0.2 : 0.06) * (0.6 + v.pulse);
     core.current.scale.setScalar(p);
     glow.current.scale.setScalar(p * 1.9);
 
-    // Color de todos los materiales.
     (core.current.material as THREE.MeshBasicMaterial).color.copy(c);
     (glow.current.material as THREE.MeshBasicMaterial).color.copy(c);
     (ico.current.material as THREE.MeshBasicMaterial).color.copy(c);
@@ -125,7 +105,6 @@ export default function NexusCore() {
       ((m as THREE.Mesh).material as THREE.MeshBasicMaterial).color.lerp(c, 0.1);
     }
 
-    // Partículas: convergen (searching) o se expanden (answering).
     const target =
       status === "searching" ? 0.5 : status === "thinking" ? 0.8 : active ? 1.28 : 1.0;
     radMul.current = THREE.MathUtils.lerp(radMul.current, target, 0.05);
@@ -136,7 +115,6 @@ export default function NexusCore() {
     }
     pos.needsUpdate = true;
 
-    // Anillo ecualizador: se enciende al responder.
     const tm = ticks.current.material as THREE.MeshBasicMaterial;
     if (active) {
       for (let i = 0; i < TICKS; i++) {
@@ -157,7 +135,6 @@ export default function NexusCore() {
 
   return (
     <group ref={root} position={[0, 0.9, 0]}>
-      {/* halo aditivo del núcleo */}
       <mesh ref={glow}>
         <sphereGeometry args={[0.55, 16, 16]} />
         <meshBasicMaterial
@@ -168,22 +145,18 @@ export default function NexusCore() {
           depthWrite={false}
         />
       </mesh>
-      {/* núcleo incandescente */}
       <mesh ref={core}>
         <sphereGeometry args={[0.5, 32, 32]} />
         <meshBasicMaterial color="#a5f3fc" toneMapped={false} />
       </mesh>
-      {/* icosaedro interno wireframe */}
       <mesh ref={ico}>
         <icosahedronGeometry args={[1.15, 1]} />
         <meshBasicMaterial color="#22d3ee" wireframe transparent opacity={0.6} />
       </mesh>
-      {/* cascarón geodésico externo */}
       <mesh ref={shell}>
         <icosahedronGeometry args={[2.1, 2]} />
         <meshBasicMaterial color="#22d3ee" wireframe transparent opacity={0.12} />
       </mesh>
-      {/* anillos orbitales */}
       <group ref={rings} rotation={[1.2, 0, 0]}>
         <mesh>
           <torusGeometry args={[1.7, 0.012, 8, 120]} />
@@ -198,14 +171,12 @@ export default function NexusCore() {
           <meshBasicMaterial color="#e879f9" transparent opacity={0.3} />
         </mesh>
       </group>
-      {/* anillo ecualizador (se enciende al responder) */}
       <group ref={ticksGrp}>
         <instancedMesh ref={ticks} args={[undefined, undefined, TICKS]} frustumCulled={false}>
           <boxGeometry args={[0.03, 0.4, 0.03]} />
           <meshBasicMaterial color="#22d3ee" transparent opacity={0.15} />
         </instancedMesh>
       </group>
-      {/* partículas orbitales */}
       <points ref={points} geometry={pGeo} frustumCulled={false}>
         <pointsMaterial color="#67e8f9" size={0.05} sizeAttenuation transparent opacity={0.85} />
       </points>

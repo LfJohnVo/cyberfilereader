@@ -34,7 +34,7 @@ def test_grade_insuficiente():
 
 
 def test_grade_fail_open():
-    # Si el grader falla, se asume suficiente (no bloquea la respuesta).
+    # Fail-open: si el grader falla se asume suficiente.
     assert grade_context(_BoomLLM(), "x", _HITS) is True
 
 

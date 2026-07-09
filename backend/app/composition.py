@@ -1,9 +1,3 @@
-"""Composition root: construye el grafo de objetos (adaptadores + casos de uso) en un solo lugar.
-
-Es el ÚNICO punto donde se instancian los adaptadores concretos (Ollama/Qdrant). Las capas de
-aplicación y presentación reciben las dependencias ya construidas; ninguna las crea por su cuenta.
-"""
-
 import logging
 from dataclasses import dataclass
 

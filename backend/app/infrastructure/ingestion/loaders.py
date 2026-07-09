@@ -1,8 +1,3 @@
-"""Extrae texto de PDF, DOCX, TXT, MD, XLSX y CSV como lista de Documents.
-
-Cada loader es una función pura: sin red, sin estado, fácil de testear.
-"""
-
 import logging
 from pathlib import Path
 

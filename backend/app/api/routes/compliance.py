@@ -1,5 +1,3 @@
-"""Ruta POST /api/compliance: evalúa el cumplimiento de un archivo cargado vs. el SGI/ISO."""
-
 import asyncio
 import logging
 import os
@@ -19,9 +17,7 @@ router = APIRouter()
 
 
 def _guard_zip_bomb(path: Path, max_uncompressed_mb: int) -> None:
-    """Los .docx/.xlsx son contenedores ZIP: un archivo pequeño puede expandirse a varios GB
-    (zip-bomb) y agotar la memoria del worker. Se valida el tamaño DECLARADO sin descomprimir
-    antes de que los loaders abran el archivo."""
+    # .docx/.xlsx son contenedores ZIP: valida el tamaño declarado antes de descomprimir (zip-bomb).
     if path.suffix.lower() not in (".docx", ".xlsx"):
         return
     try:
@@ -48,8 +44,7 @@ async def compliance(
     if len(data) > s.max_file_mb * 1024 * 1024:
         raise HTTPException(400, f"El archivo supera {s.max_file_mb} MB.")
 
-    # Área objetivo: el formulario puede ACOTAR a un subconjunto de los permisos del usuario,
-    # nunca ampliarlos (el perfil "*" tiene acceso total). Evita evadir el filtro de área.
+    # El formulario solo puede acotar las áreas del usuario, nunca ampliarlas.
     requested = [a.strip() for a in areas_field.split(",") if a.strip()] if areas_field else None
     if not requested:
         target = user_areas
@@ -60,7 +55,6 @@ async def compliance(
     else:
         raise HTTPException(403, "No tiene permiso sobre las áreas solicitadas.")
 
-    # Extrae el texto en un archivo temporal (reutiliza los loaders de ingesta).
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=ext)  # noqa: SIM115
     try:
         tmp.write(data)
@@ -69,7 +63,7 @@ async def compliance(
         docs = load_file(Path(tmp.name))
         text = "\n".join(d.page_content for d in docs)
     except HTTPException:
-        raise  # p. ej. la guarda anti zip-bomb: conserva su mensaje específico
+        raise
     except Exception:
         log.exception("Fallo extrayendo texto del archivo cargado")
         raise HTTPException(400, "No se pudo leer el contenido del archivo.") from None

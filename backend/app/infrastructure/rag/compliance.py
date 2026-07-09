@@ -1,9 +1,3 @@
-"""Evalúa el cumplimiento de un documento cargado frente a los requisitos del SGI/ISO.
-
-Reutiliza el retriever (mismos filtros de área/estado) para traer los requisitos aplicables
-y pide al LLM un dictamen estructurado (veredicto + hallazgos + recomendaciones) con citas.
-"""
-
 import logging
 import re
 
@@ -17,7 +11,7 @@ from app.infrastructure.rag.retriever import retrieve
 
 log = logging.getLogger(__name__)
 
-_MAX_DOC_CHARS = 4500  # recorte del documento para no desbordar el contexto del LLM
+_MAX_DOC_CHARS = 4500
 _VERDICT_RE = re.compile(r"VEREDICTO:\s*(NO\s*CUMPLE|CUMPLE|PARCIAL)", re.IGNORECASE)
 
 
@@ -45,7 +39,6 @@ def assess_compliance(
             "sources": [],
         }
 
-    # Recupera los requisitos del SGI aplicables usando el contenido del documento como consulta.
     hits = retrieve(vectorstore, doc[:1500], areas)
     if not hits:
         return {
@@ -60,9 +53,7 @@ def assess_compliance(
 
     requisitos, fuentes = format_context(hits)
 
-    # El documento se recorta para no desbordar el contexto del LLM. Si se trunca, se avisa
-    # (en el log y en el propio informe) para no dar una falsa sensación de completitud: un
-    # documento largo con incumplimientos más allá del recorte podría dar un falso CUMPLE.
+    # Si se trunca, incumplimientos más allá del recorte podrían dar un falso CUMPLE.
     truncado = len(doc) > _MAX_DOC_CHARS
     if truncado:
         log.warning(

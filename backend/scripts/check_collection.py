@@ -1,13 +1,3 @@
-"""Verificación de la colección Qdrant e inventario del corpus (SOLO LECTURA).
-
-Fase 0 del plan de evolución RAG: confirma que la dimensión de la colección coincide
-con el modelo de embeddings configurado y muestra el inventario de metadatos, útil para
-construir el set dorado (backend/tests/eval/golden.json).
-
-Uso (desde backend/, con el venv activo):
-    python -m scripts.check_collection
-"""
-
 import logging
 import sys
 from collections import Counter
@@ -16,7 +6,7 @@ from app.core.config import get_settings
 from app.infrastructure.rag.embeddings import get_embeddings
 from app.infrastructure.rag.vectorstore import get_client
 
-# Consolas Windows (cp1252) no codifican acentos/símbolos: forzamos UTF-8 y no reventamos.
+# Consolas Windows (cp1252) no codifican acentos: forzamos UTF-8 sin reventar.
 try:
     sys.stdout.reconfigure(encoding="utf-8")
 except Exception:  # noqa: BLE001
@@ -27,9 +17,9 @@ logging.basicConfig(level="WARNING", format="%(levelname)s %(name)s: %(message)s
 
 def _collection_dim(info) -> object:
     vectors = info.config.params.vectors
-    if hasattr(vectors, "size"):  # vector denso único (sin nombre)
+    if hasattr(vectors, "size"):
         return vectors.size
-    if isinstance(vectors, dict):  # named vectors (p. ej. tras activar híbrido)
+    if isinstance(vectors, dict):
         return {name: params.size for name, params in vectors.items()}
     return "desconocida"
 
@@ -51,7 +41,6 @@ def main() -> None:
     print(f"Puntos indexados ... {count}")
     print(f"Dimension coleccion  {coll_dim}")
 
-    # Dimensión del modelo de embeddings actual (requiere Ollama alcanzable).
     try:
         embed_dim = len(get_embeddings().embed_query("probe"))
         print(f"Modelo embeddings .. {s.ollama_embed_model} -> {embed_dim} dim")
@@ -66,7 +55,6 @@ def main() -> None:
     except Exception as e:  # noqa: BLE001 — diagnóstico
         print(f"[!] No se pudo consultar Ollama en {s.ollama_base_url}: {e}")
 
-    # Inventario de metadatos vía scroll (solo payload, sin vectores).
     areas, estados, dtypes, files = Counter(), Counter(), Counter(), Counter()
     offset = None
     while True:

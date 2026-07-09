@@ -1,5 +1,3 @@
-"""Ruta GET /api/health: estado de Qdrant y Ollama."""
-
 import httpx
 from fastapi import APIRouter, Request
 

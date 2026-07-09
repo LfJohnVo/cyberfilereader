@@ -1,4 +1,4 @@
-// Contrato compartido con el backend: los 7 estados del agente (idénticos a schemas/chat.py).
+// Debe coincidir con schemas/chat.py del backend.
 export type AgentStatus =
   | "idle"
   | "listening"
@@ -8,7 +8,6 @@ export type AgentStatus =
   | "no_info"
   | "error";
 
-// Paleta cyberpunk (cian/magenta). `speed/ring/pulse` alimentan el aura del avatar y el fondo.
 export const STATUS_VISUALS: Record<
   AgentStatus,
   { label: string; color: string; speed: number; ring: number; pulse: number }

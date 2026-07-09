@@ -1,15 +1,10 @@
-"""Metadatos (área, tipo, versión, estado) inferidos de la RUTA del archivo (guidelines §8).
-
-Convención: docs/<AREA>/<TIPO?>/archivo.pdf. Carpeta o nombre OBSOLETO ⇒ estado=obsoleto.
-Versión: detecta sufijos ` vN`, `_vN`, `-v.N`, `VN`, `V.N` (may/min) y toma la última coincidencia.
-"""
+"""Metadatos inferidos de la RUTA del archivo (guidelines §8)."""
 
 import re
 from datetime import UTC, datetime
 from pathlib import Path
 
-# v/V opcionalmente precedida por espacio, guion o guion bajo, con punto opcional:
-#   " v8", "_v2", "-v.1", " V11", "V.3"  ->  grupo = "8" / "2" / "1" / "11" / "3"
+# Toma la última coincidencia de versión del nombre.
 _VERSION_RE = re.compile(r"[ _\-]v\.?\s*(\d+(?:\.\d+)*)", re.IGNORECASE)
 
 

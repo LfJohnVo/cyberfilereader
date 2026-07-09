@@ -1,10 +1,3 @@
-"""Reordenamiento de candidatos con un cross-encoder (fastembed).
-
-El recuperador denso trae varios candidatos por similitud coseno; el cross-encoder
-puntúa cada par consulta-fragmento y suele ordenar mejor la relevancia real. El modelo
-se carga una sola vez.
-"""
-
 import logging
 import math
 from functools import lru_cache
@@ -26,7 +19,6 @@ def _encoder():
 
 
 def rerank(query: str, hits: list[tuple[Document, float]]) -> list[tuple[Document, float]]:
-    """Ordena (doc, score) de mayor a menor por relevancia del cross-encoder (0-1)."""
     docs = [d for d, _ in hits]
     raw = _encoder().rerank(query, [d.page_content for d in docs])
     ranked = sorted(zip(docs, raw, strict=True), key=lambda ds: ds[1], reverse=True)

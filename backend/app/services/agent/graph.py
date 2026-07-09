@@ -7,8 +7,8 @@ llevan `areas` en el cierre, de modo que respetan el control de acceso por área
 
 import logging
 
+from langchain.agents import create_agent
 from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
 
 from app.services.rag.compliance import assess_compliance
 from app.services.rag.formatting import to_source
@@ -57,7 +57,9 @@ def run_agent(llm, vectorstore, question: str, areas: list[str] | None) -> dict:
         fuentes.extend(r.get("sources", []))
         return f"VEREDICTO: {r['verdict']}\n\n{r['report']}"
 
-    agent = create_react_agent(llm, [buscar_documentos, evaluar_cumplimiento], prompt=_AGENT_PROMPT)
+    agent = create_agent(
+        llm, [buscar_documentos, evaluar_cumplimiento], system_prompt=_AGENT_PROMPT
+    )
     out = agent.invoke(
         {"messages": [("user", question)]}, config={"recursion_limit": _RECURSION_LIMIT}
     )

@@ -1,21 +1,32 @@
-fastapi>=0.115
+# Dependencias (intención). El pin exacto reproducible vive en requirements.lock.
+# ---- API ----
+fastapi>=0.115,<1
 uvicorn[standard]>=0.30
-pydantic-settings>=2.4
-langchain>=0.3
-langchain-community>=0.3
-langchain-ollama>=0.2
-langchain-qdrant>=0.2
-langchain-text-splitters>=0.3
-langgraph>=0.2
-qdrant-client>=1.12
-fastembed>=0.4
+python-multipart>=0.0.9
+slowapi>=0.1.9
+httpx>=0.27
+pydantic>=2.11,<3
+pydantic-settings>=2.4,<3
+
+# ---- LangChain 1.0 LTS (se usa langchain-core + integraciones + langchain[.agents] + langgraph) ----
+langchain>=1.3,<2
+langchain-core>=1.4,<2
+langchain-ollama>=1.1,<2
+langchain-qdrant>=1.1,<2
+langchain-text-splitters>=1.1,<2
+langgraph>=1.2,<2
+
+# ---- Vector DB + recuperación ----
+qdrant-client>=1.18,<2
+fastembed>=0.4,<1
+
+# ---- Loaders de documentos ----
 pypdf>=5.0
 docx2txt>=0.8
 pandas>=2.2
 openpyxl>=3.1
-python-multipart>=0.0.9
-slowapi>=0.1.9
-httpx>=0.27
+
+# ---- Dev / test ----
 pytest>=8.2
 pytest-asyncio>=0.23
 ruff>=0.5

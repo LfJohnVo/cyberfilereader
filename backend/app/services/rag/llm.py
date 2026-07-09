@@ -1,23 +1,24 @@
-"""Factoría del chat model (Ollama). Único punto para cambiar de proveedor."""
+"""Factoría del chat model (Ollama vía init_chat_model). Único punto para cambiar de proveedor."""
 
 import re
 
-from langchain_ollama import ChatOllama
+from langchain.chat_models import init_chat_model
+from langchain_core.language_models import BaseChatModel
 
 from app.core.config import get_settings
 
 _THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL | re.IGNORECASE)
 
 
-def get_chat_model() -> ChatOllama:
+def get_chat_model() -> BaseChatModel:
     s = get_settings()
-    return ChatOllama(
-        model=s.ollama_chat_model,
+    return init_chat_model(
+        s.ollama_chat_model,
+        model_provider="ollama",
         base_url=s.ollama_base_url,
         temperature=s.llm_temperature,
         num_ctx=s.ollama_num_ctx,
-        # Desactiva el modo "thinking" de qwen3: para respuestas fundamentadas en el contexto
-        # no aporta y a veces devuelve solo <think> (respuesta vacía). Además reduce latencia.
+        # qwen3 es "thinking": desactivarlo evita respuestas vacías (solo <think>) y baja latencia.
         reasoning=False,
     )
 

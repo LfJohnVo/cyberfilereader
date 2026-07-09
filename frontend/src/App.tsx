@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import AgentStatusPanel from "./components/AgentStatusPanel";
+import AvatarPicker from "./components/AvatarPicker";
 import ComplianceModal from "./components/ComplianceModal";
 import ErrorBoundary from "./components/ErrorBoundary";
 import VoiceControls from "./components/VoiceControls";
@@ -39,6 +40,7 @@ export default function App() {
       {/* paneles laterales */}
       <div className="absolute left-4 top-16 z-20 space-y-3">
         <AgentStatusPanel />
+        <AvatarPicker />
         <VoiceControls />
         <ComplianceModal />
       </div>

@@ -1,9 +1,9 @@
 import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { isSpeaking } from "../lib/tts";
-import { useAgentStore } from "../stores/agentStore";
-import { STATUS_VISUALS, type AgentStatus } from "./statusVisuals";
+import { isSpeaking } from "../../lib/tts";
+import { useAgentStore } from "../../stores/agentStore";
+import { STATUS_VISUALS, type AgentStatus } from "../statusVisuals";
 
 /**
  * NexusCore — núcleo de IA futurista, 100% procedural (Three.js), que "actúa" según el

@@ -1,8 +1,9 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useAgentStore } from "../stores/agentStore";
-import NexusCore from "./NexusCore";
+import { useSettingsStore } from "../stores/settingsStore";
+import { avatarById } from "./avatars/registry";
 import { STATUS_VISUALS } from "./statusVisuals";
 
 /** Terreno low-poly wireframe animado, con nodos brillantes en los vértices.
@@ -103,6 +104,20 @@ function webglAvailable(): boolean {
 }
 
 export default function Scene() {
+  const avatarId = useSettingsStore((s) => s.avatarId);
+  const desc = avatarById(avatarId);
+  const Avatar = desc.component;
+
+  // Avatar 2D (sin Three.js): se monta sin <Canvas>.
+  if (desc.kind === "dom") {
+    return (
+      <Suspense fallback={null}>
+        <Avatar />
+      </Suspense>
+    );
+  }
+
+  // Avatar 3D: dentro del <Canvas> compartido (con el fondo de terreno + partículas).
   if (!webglAvailable()) return null; // el degradado de fondo (CSS body) hace de respaldo
 
   return (
@@ -114,7 +129,9 @@ export default function Scene() {
       <color attach="background" args={["#050813"]} />
       <fog attach="fog" args={["#050813", 9, 24]} />
       <ambientLight intensity={0.5} />
-      <NexusCore />
+      <Suspense fallback={null}>
+        <Avatar />
+      </Suspense>
       <ParticleField />
       <Terrain />
     </Canvas>

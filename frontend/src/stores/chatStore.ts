@@ -67,17 +67,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
       await new Promise<void>((resolve) => {
         const full = res.answer;
         let startTs = 0;
+        let prevN = -1;
         const step = (ts: number) => {
           if (!startTs) startTs = ts;
           const n = Math.min(full.length, Math.floor(((ts - startTs) / 1000) * REVEAL_CPS));
-          set((s) => {
-            const msgs = s.messages.slice();
-            const li = msgs.length - 1;
-            if (li >= 0 && msgs[li].role === "assistant") {
-              msgs[li] = { ...msgs[li], content: full.slice(0, n) };
-            }
-            return { messages: msgs };
-          });
+          // rAF corre a ~60 fps pero el texto solo avanza a REVEAL_CPS: evita el `set` (y el
+          // re-render) redundante cuando no se revelaron caracteres nuevos en este frame.
+          if (n !== prevN) {
+            prevN = n;
+            set((s) => {
+              const msgs = s.messages.slice();
+              const li = msgs.length - 1;
+              if (li >= 0 && msgs[li].role === "assistant") {
+                msgs[li] = { ...msgs[li], content: full.slice(0, n) };
+              }
+              return { messages: msgs };
+            });
+          }
           if (n < full.length) revealRAF = requestAnimationFrame(step);
           else resolve();
         };

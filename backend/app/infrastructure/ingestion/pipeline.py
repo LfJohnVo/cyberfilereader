@@ -16,6 +16,7 @@ from app.infrastructure.ingestion.loaders import load_file
 from app.infrastructure.ingestion.metadata import infer_metadata
 from app.infrastructure.rag.embeddings import get_embeddings
 from app.infrastructure.rag.vectorstore import (
+    assert_schema,
     delete_by_source,
     ensure_collection,
     get_client,
@@ -65,6 +66,9 @@ def run_ingestion(full: bool = False) -> dict:
     dim = len(embeddings.embed_query("probe"))  # 768 con nomic-embed-text
     client = get_client()
     ensure_collection(client, dim)
+    # Falla rápido ANTES de borrar/insertar si la colección existente no coincide con el modelo
+    # (p. ej. embeder a 4096-dim contra una colección creada a 768-dim): evita vaciar documentos.
+    assert_schema(client, dim)
     vs = get_vectorstore(client, embeddings)
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=s.chunk_size,
@@ -74,7 +78,14 @@ def run_ingestion(full: bool = False) -> dict:
 
     manifest = {} if full else _load_manifest()
     vistos = set()
-    resumen = {"indexados": 0, "sin_cambios": 0, "eliminados": 0, "chunks": 0, "errores": []}
+    resumen = {
+        "indexados": 0,
+        "sin_cambios": 0,
+        "eliminados": 0,
+        "chunks": 0,
+        "vacios": [],
+        "errores": [],
+    }
 
     for path in _iter_files(root):
         rel = path.relative_to(root).as_posix()
@@ -94,15 +105,20 @@ def run_ingestion(full: bool = False) -> dict:
                 c.metadata["chunk"] = i
             if chunks:
                 vs.add_documents(chunks)
+                resumen["indexados"] += 1
+                resumen["chunks"] += len(chunks)
+                log.info("Indexado %s (%d chunks, estado=%s)", rel, len(chunks), meta["estado"])
+            else:  # carga pero no extrae texto (¿escaneo sin OCR / archivo vacío?)
+                resumen["vacios"].append(rel)
+                log.warning("Sin chunks (¿escaneo/vacío?): %s", rel)
+            # El manifest se actualiza siempre (incluso con 0 chunks) para no recargar en balde;
+            # los vacíos quedan visibles en resumen["vacios"] en vez de contarse como indexados.
             manifest[rel] = {
                 "sha256": digest,
                 "chunks": len(chunks),
                 "estado": meta["estado"],
                 "area": meta["area"],
             }
-            resumen["indexados"] += 1
-            resumen["chunks"] += len(chunks)
-            log.info("Indexado %s (%d chunks, estado=%s)", rel, len(chunks), meta["estado"])
         except Exception as e:  # un archivo malo no frena la ingesta
             resumen["errores"].append({"archivo": rel, "error": str(e)})
             log.exception("Error ingiriendo %s", rel)

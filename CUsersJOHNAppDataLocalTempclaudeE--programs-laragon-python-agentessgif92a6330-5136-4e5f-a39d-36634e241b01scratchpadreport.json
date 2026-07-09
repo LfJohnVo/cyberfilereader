@@ -1,0 +1,42 @@
+{
+  "area": "Sistema de Gestion Integral SGI ISO Corpus y Ingesta",
+  "resumen": "El corpus contiene 80 documentos PDF (20 vigentes, 60 obsoletos) distribuidos en 8 areas funcionales (Transformacion, Ciberinteligencia, Talento, Servicios, Automatizacion, Capacitacion, Marketing, Soporte) con aproximadamente 2200 chunks indexados. Los 20 documentos vigentes forman un sistema integrado basado en 6 normas ISO (9001, 20000, 27001, 37001, 22301, 42001) implementado en 6 manuales SGI interconectados (M-SGI-001 a M-SGI-009, versiones 8-16) que referencian aproximadamente 30 formatos operacionales (F-SGI-*) y procedimientos (PR-*). La ingesta actual usa RecursiveCharacterTextSplitter produciendo ~900 chunks vigentes con metadatos planos sin capturar estructura jerarquica ni relaciones entre documentos.",
+  "hallazgos": [
+    "CUANTIFICACION EN MANIFEST.JSON: 80 documentos totales (20 vigentes, 900 chunks; 60 obsoletos, 1300+ chunks). Distribucion vigente: Transformacion 6 docs (600 chunks, M-SGI-002 v13 de 289 chunks), Ciberinteligencia 10 (247), Gestion Talento 3 (207, M-GET-012 v8 de 183 chunks), Gestion Servicios 2 (80), Capacitacion 1 (44), Automatizacion 2 (27), Marketing 1 (10), Soporte 1 (20).",
+    "M-SGI-001 v16 (88 chunks) marco base SGI integrado para ISO 9001/20000/27001/37001/22301/42001; documenta referencias a M-SGI-002, M-SGI-005, F-SGI-024 puestos criticos, Tabantaj herramienta.",
+    "M-SGI-002 v13 (289 chunks, documento mas denso) Manual de Politicas del SGI; contiene referencias explicitas a M-SGI-001 implementacion SGI, M-SGI-005 analisis riesgos, M-CIB-002 v3 inteligencia amenazas, F-SGI-009 Matriz RASCI, F-SGI-019 directorio autoridades, F-SGI-036 inventario activos, PR-GET-005 desvinculacion personal.",
+    "M-SGI-005 v8 (46 chunks) Metodologia Analisis Riesgos basada ISO 31000:2018; referencia M-SGI-001 contexto organizacional, genera salidas formales F-SGI-011 matriz analisis, F-SGI-012 planes tratamiento, F-SGI-013 carta aceptacion.",
+    "M-SGI-007 v8 (90 chunks) Manual Sistema Antisoborno; referencia M-SGI-001 alineacion marco integral, M-SGI-005 evaluacion conforme metodologia riesgos, F-SGI-024 puestos criticos, F-SGI-010 tablero indicadores, F-SGI-011 matriz riesgos, PR-SGI-002 auditoria interna, Tabantaj herramienta.",
+    "JERARQUIA DOCUMENTOS: M-SGI-001 marco base conecta a especialistas M-SGI-002 politicas, M-SGI-005 riesgos, M-SGI-007 antisoborno, M-SGI-008 BIA, M-SGI-009 SGIA. M-SGI-002 referencia cruzada a M-CIB-002 para inteligencia amenazas conforme metodologia.",
+    "PIPELINE INGESTA (pipeline.py lineas 69-94): RecursiveCharacterTextSplitter con separadores [newline x2, newline, punto-espacio, espacio, vacio]; output es Document(page_content=texto, metadata={source, file_name, area, doc_type, version, estado, fecha_modificacion, sha256, chunk_id_secuencial}). No preserva: section_id, parent_chunk, entity_type policy format procedure, references_to array.",
+    "METADATOS POR CHUNK: source=ruta relativa, area=carpeta raiz, version=detectada de sufijo vN, estado=vigente obsoleto, chunk=indice secuencial 0,1,2... NO captura dependencias hacia otros documentos ni identificadores de seccion logica.",
+    "RETRIEVER (retriever.py): busqueda vectorial similarity_search_with_score con filtro solo area+estado vigente. Trae TOP-K chunks mas similares sin navegacion documento-a-documento. Sin mecanismo para 'traer doc X que referencia doc Y'.",
+    "COMPLIANCE ASSESSMENT (compliance.py lineas 49-61): extrae doc[:1500], busca requisitos similares via retrieve(), NO busca dependencias. LLM resuelve conformidad en contexto local."
+  ],
+  "archivos_clave": [
+    "E:/programs/laragon/python/agentessgi/data/manifest.json - inventario 80 docs con SHA256 version chunks estado area",
+    "E:/programs/laragon/python/agentessgi/backend/app/infrastructure/ingestion/pipeline.py - RecursiveCharacterTextSplitter metadata plano",
+    "E:/programs/laragon/python/agentessgi/backend/app/infrastructure/ingestion/metadata.py - inferencia area version estado desde ruta",
+    "E:/programs/laragon/python/agentessgi/backend/app/infrastructure/rag/retriever.py - busqueda vectorial sin graph",
+    "E:/programs/laragon/python/agentessgi/backend/app/infrastructure/rag/chain.py - orquestacion retrieve LLM",
+    "E:/programs/laragon/python/agentessgi/backend/app/domain/models.py - SearchResult, Fuente, Veredicto sin entidades",
+    "E:/programs/laragon/python/agentessgi/docs/Transformacion/M-SGI-001 Manual de Sistema de Gestion Integral v16.pdf - marco base",
+    "E:/programs/laragon/python/agentessgi/docs/Transformacion/M-SGI-002 Manual de Politicas del SGI v13.pdf - politicas referencias densas"
+  ],
+  "senales_pro_graphrag": [
+    "ENTIDADES IDENTIFICABLES: politicas M-SGI-*, formatos F-SGI-*, procedimientos PR-*, estandares ISO, areas funcionales. Corpus compacto permite extraccion confiable de entidades tipadas.",
+    "REFERENCIAS EXPLÍCITAS: M-SGI-002 menciona 6+ formatos F-SGI-* en politicas especificas; M-SGI-007 cita M-SGI-001, M-SGI-005, F-SGI-024, F-SGI-010, F-SGI-011, PR-SGI-002. Referencias estructuradas nombre-numero sin ambiguedad.",
+    "RELACIONES TIPADAS FRECUENTES: implementa M-SGI-002 implementa M-SGI-001, conforme_a M-SGI-002 conforme M-SGI-005, requiere_uso_de M-SGI-002 requiere F-SGI-009, ciclo_vida P-SGI-026 es ciclo de M-SGI-009.",
+    "PREGUNTAS MULTI-HOP NATURALES: quien implementa requisito X ISO?, que formato es entrada de procedimiento Y?, que riesgos asocia metodologia Z?, que politicas tratan riesgo W?. Actual RAG resuelve con magia vectorial.",
+    "JERARQUIAS IMPLÍCITAS: M-SGI-001 marco nivel 0, M-SGI-{002,005,007,008,009} especializaciones nivel 1, procedimientos PR-* nivel 2, formatos F-SGI-* nivel 3. Chunking plano rompe navegacion vertical.",
+    "AUDITORIA Y COMPLIANCE: lineage completo politica→procedimiento→formato→responsable es requerimiento operacional real. Actualmente LLM no puede mapear cadena completa sin graph."
+  ],
+  "senales_contra_graphrag": [
+    "CORPUS VIGENTE COMPACTO: solo 900 chunks, no requiere optimizacion extrema. Retrieval vectorial satisface mayoría de consultas rapido.",
+    "PREGUNTAS DENTRO-DE-DOCUMENTO: cual es politica X?, que requisitos menciona doc Y?, como se ejecuta procedimiento Z? son within-document, solubles con top-k chunks + LLM sin graph.",
+    "COMPLIANCE SIMPLE: compliance.py busca requisitos similares a documento uploaded, no mapea dependencias. Veredicto es CUMPLE PARCIAL NOCUMPLE local, no requiere trazabilidad global.",
+    "AUSENCIA SOLICITUDES GRAFO: usuarios no piden mapear dependencias de politica, auditar linaje completo, o validar consistencia entre estandares. Solo consultas directas: que dice politica X sobre tema Y?",
+    "FRAGMENTACION CONTROLADA: chunk_size ~768 tokens, overlaps, separadores naturales. Chunking rara vez rompe politica completa. Top-k=5-10 recupera contexto suficiente para LLM.",
+    "SIN ANOTACIONES ESTRUCTURADAS: corpus real es PDFs SGI clasicos. No hay metadatos formales tipo section_id, policy_implementa_iso, etc. Extraccion graph requeriria parsing complejo o LLM preprocessing."
+  ]
+}

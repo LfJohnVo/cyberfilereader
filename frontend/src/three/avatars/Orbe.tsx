@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { isSpeaking } from "../../lib/tts";
 import { useAgentStore } from "../../stores/agentStore";
@@ -49,6 +49,10 @@ export default function Orbe() {
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     return { pGeo: g, dirs: d, radii: r };
   }, []);
+
+  // La geometría se pasa por prop (no como hijo JSX): R3F no la libera al desmontar. Al cambiar
+  // de avatar se desmonta este componente, así que liberamos el BufferGeometry (CPU + VBO GPU).
+  useEffect(() => () => pGeo.dispose(), [pGeo]);
 
   useFrame((state, dt) => {
     const { status, talking } = useAgentStore.getState();

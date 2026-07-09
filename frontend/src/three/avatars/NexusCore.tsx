@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { isSpeaking } from "../../lib/tts";
 import { useAgentStore } from "../../stores/agentStore";
@@ -71,6 +71,10 @@ export default function NexusCore() {
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     return { pGeo: g, dirs: d, radii: r };
   }, []);
+
+  // La geometría se pasa por prop (no como hijo JSX), así que R3F no la libera al desmontar.
+  // Al cambiar de avatar se desmonta este componente: liberamos el BufferGeometry (CPU + VBO GPU).
+  useEffect(() => () => pGeo.dispose(), [pGeo]);
 
   useLayoutEffect(() => {
     for (let i = 0; i < TICKS; i++) {

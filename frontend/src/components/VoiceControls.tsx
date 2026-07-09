@@ -2,7 +2,12 @@ import { VOICE_PRESETS, speak, voiceNameFor } from "../lib/tts";
 import { useSettingsStore } from "../stores/settingsStore";
 
 export default function VoiceControls() {
-  const { voiceEnabled, presetId, setVoiceEnabled, setPreset } = useSettingsStore();
+  // Selectores atómicos: así este panel solo re-renderiza cuando cambian voz/preset, no al
+  // cambiar de avatar (avatarId vive en el mismo store).
+  const voiceEnabled = useSettingsStore((s) => s.voiceEnabled);
+  const presetId = useSettingsStore((s) => s.presetId);
+  const setVoiceEnabled = useSettingsStore((s) => s.setVoiceEnabled);
+  const setPreset = useSettingsStore((s) => s.setPreset);
   return (
     <aside className="neon neon-mag clip-hud pointer-events-auto w-[248px] p-3 font-mono text-[11px]">
       <div className="mb-2 flex items-center justify-between">

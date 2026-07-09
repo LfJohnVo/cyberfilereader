@@ -60,6 +60,18 @@ def assess_compliance(
 
     requisitos, fuentes = format_context(hits)
 
+    # El documento se recorta para no desbordar el contexto del LLM. Si se trunca, se avisa
+    # (en el log y en el propio informe) para no dar una falsa sensación de completitud: un
+    # documento largo con incumplimientos más allá del recorte podría dar un falso CUMPLE.
+    truncado = len(doc) > _MAX_DOC_CHARS
+    if truncado:
+        log.warning(
+            "compliance: documento truncado doc=%s de %d a %d chars (dictamen solo del inicio)",
+            doc_name,
+            len(doc),
+            _MAX_DOC_CHARS,
+        )
+
     mensajes = [
         SystemMessage(content=COMPLIANCE_SYSTEM_PROMPT),
         HumanMessage(
@@ -70,11 +82,17 @@ def assess_compliance(
             )
         ),
     ]
-    log.info("compliance doc=%s areas=%s reqs=%d", doc_name, areas, len(hits))
+    log.info("compliance doc=%s areas=%s reqs=%d chars=%d", doc_name, areas, len(hits), len(doc))
     report = strip_reasoning(llm.invoke(mensajes).content)
+    verdict = _verdict(report)
+    if truncado:
+        report = (
+            f"[AVISO: documento truncado a {_MAX_DOC_CHARS} de {len(doc)} caracteres; "
+            "el dictamen cubre solo el inicio del documento.]\n\n" + report
+        )
     return {
         "file_name": doc_name,
-        "verdict": _verdict(report),
+        "verdict": verdict,
         "report": report,
         "sources": fuentes,
     }

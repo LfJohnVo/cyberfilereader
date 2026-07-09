@@ -18,7 +18,8 @@ class Settings(BaseSettings):
     docs_dir: str = "./docs"
     data_dir: str = "./data"
     allowed_extensions: str = ".pdf,.docx,.txt,.md,.xlsx,.csv"
-    max_file_mb: int = 25
+    max_file_mb: int = 25  # tope del archivo COMPRIMIDO recibido
+    max_uncompressed_mb: int = 150  # tope DESCOMPRIMIDO de .docx/.xlsx (anti zip-bomb)
 
     chunk_size: int = 1000
     chunk_overlap: int = 150
@@ -36,6 +37,7 @@ class Settings(BaseSettings):
     ollama_chat_model: str = "qwen3:8b"  # el modelo real se fija en .env (override)
     ollama_embed_model: str = "nomic-embed-text"
     ollama_num_ctx: int = 8192
+    ollama_request_timeout: float = 120.0  # s; corta invocaciones colgadas (evita agotar el pool)
     llm_temperature: float = 0.1
 
     qdrant_url: str = ""

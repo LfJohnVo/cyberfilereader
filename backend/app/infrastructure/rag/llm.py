@@ -18,6 +18,9 @@ def get_chat_model() -> BaseChatModel:
         base_url=s.ollama_base_url,
         temperature=s.llm_temperature,
         num_ctx=s.ollama_num_ctx,
+        # Timeout del cliente httpx subyacente: si Ollama se cuelga, invoke() lanza en vez de
+        # bloquear indefinidamente un worker de asyncio.to_thread (y agotar el pool).
+        client_kwargs={"timeout": s.ollama_request_timeout},
         # qwen3 es "thinking": desactivarlo evita respuestas vacías (solo <think>) y baja latencia.
         reasoning=False,
     )

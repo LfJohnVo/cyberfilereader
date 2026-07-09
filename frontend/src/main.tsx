@@ -1,4 +1,4 @@
-import './lib/secureContext' // PRIMERO: parcha crypto.randomUUID en contextos HTTP (sin HTTPS)
+import './lib/secureContext' // debe ir primero: parchea crypto.randomUUID en contexto no seguro (HTTP)
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

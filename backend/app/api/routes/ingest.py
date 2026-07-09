@@ -1,10 +1,8 @@
-"""Rutas de ingesta documental (POST /api/ingest, GET /api/ingest/status)."""
-
 import asyncio
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 
-from app.services.ingestion.pipeline import run_ingestion
+from app.infrastructure.ingestion.pipeline import run_ingestion
 
 router = APIRouter()
 _lock = asyncio.Lock()

@@ -2,9 +2,7 @@ import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
-  /** Se muestra en lugar de los hijos si algo falla. Si se omite, se usa el aviso por defecto. */
   fallback?: ReactNode;
-  /** Etiqueta para distinguir el origen del fallo en consola. */
   label?: string;
 }
 
@@ -12,11 +10,7 @@ interface State {
   error: Error | null;
 }
 
-/**
- * Límite de error de React: evita la "pantalla en blanco".
- * Si un subárbol lanza en render (p. ej. WebGL no disponible), en vez de desmontar
- * TODA la app mostramos un fallback y el resto de la interfaz sigue usable.
- */
+// Aísla el fallo de un subárbol para no desmontar toda la app.
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { error: null };
 

@@ -1,5 +1,3 @@
-"""Ruta GET /api/health: estado de Qdrant y Ollama."""
-
 import httpx
 from fastapi import APIRouter, Request
 
@@ -11,7 +9,14 @@ router = APIRouter()
 @router.get("/health")
 async def health(request: Request):
     s = get_settings()
-    out = {"status": "ok", "qdrant": False, "ollama": False, "collection": s.qdrant_collection}
+    out = {
+        "status": "ok",
+        "qdrant": False,
+        "ollama": False,
+        "collection": s.qdrant_collection,
+        "chat_model": s.ollama_chat_model,
+        "embed_model": s.ollama_embed_model,
+    }
     try:
         out["qdrant"] = request.app.state.qdrant.collection_exists(s.qdrant_collection)
     except Exception as e:

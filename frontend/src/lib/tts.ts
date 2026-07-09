@@ -1,10 +1,6 @@
-// Voz femenina en español vía Web Speech API del navegador (sin backend).
 export const ttsSupported =
   typeof window !== "undefined" && "speechSynthesis" in window;
 
-// 5 "tipos" de voz seleccionables. Cada preset intenta casar una voz instalada por
-// nombre/idioma (en orden) y aplica su propio tono/velocidad para dar variedad aunque
-// el sistema tenga pocas voces en español.
 export interface VoicePreset {
   id: string;
   label: string;

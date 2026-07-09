@@ -1,12 +1,10 @@
-"""Schema de respuesta del chequeo de cumplimiento (guidelines §5)."""
-
 from pydantic import BaseModel
 
-from app.schemas.chat import Source
+from app.domain.models import Fuente, Veredicto
 
 
 class ComplianceResponse(BaseModel):
     file_name: str
-    verdict: str  # "cumple" | "parcial" | "no_cumple" | "indeterminado"
+    verdict: Veredicto
     report: str
-    sources: list[Source]
+    sources: list[Fuente]

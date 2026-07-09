@@ -1,0 +1,201 @@
+{
+  "_descripcion": "Set dorado para evaluar la recuperación. Preguntas ancladas al contenido REAL de los documentos VIGENTES (fuente verificada por construcción). Generado a partir de 'scripts.sample_chunks'. Ampliar/ajustar con preguntas reales de usuarios cuando se tengan. 'areas': null = solo filtro estado=vigente.",
+  "casos": [
+    {
+      "id": "aut-001-enmascaramiento",
+      "pregunta": "¿Para qué sirve el enmascaramiento de datos en el desarrollo de software?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-AUT-001 Aspectos de Seguridad de Desarrollo_V3.pdf"]
+    },
+    {
+      "id": "aut-002-herramientas",
+      "pregunta": "¿Qué herramientas usa el equipo de Automatización para crear aplicaciones?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-AUT-002 Herramientas de Desarrollo_v2.pdf"]
+    },
+    {
+      "id": "cap-001-examenes",
+      "pregunta": "Si repruebo el primer intento de un examen de certificación, ¿quién paga el segundo intento?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CAP-001 Manual de capacitación v1.pdf"]
+    },
+    {
+      "id": "cib-001-escaneos",
+      "pregunta": "¿Qué tipos de escaneo se emplean para detectar vulnerabilidades?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-001 Metodología de gestión de vulnerabilidades v1.pdf"]
+    },
+    {
+      "id": "cib-002-fases",
+      "pregunta": "¿Cuáles son las fases de la metodología de ciberinteligencia?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-002 Metodología de Ciberinteligencia v3.pdf"]
+    },
+    {
+      "id": "cib-003-conceptos",
+      "pregunta": "¿Qué se entiende por probabilidad y riesgo en las pruebas de ingeniería social?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-003 Metodología de Pruebas de Ingeniería Social v2.pdf"]
+    },
+    {
+      "id": "cib-004-movil",
+      "pregunta": "¿Qué herramientas se utilizan para probar la seguridad de aplicaciones móviles iOS?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-004 Metodología General de Pruebas de Intrusión a Aplicaciones Móviles iOS y Android v2.pdf"]
+    },
+    {
+      "id": "cib-005-web-foca",
+      "pregunta": "En una prueba de intrusión a aplicaciones web, ¿qué herramienta sirve para extraer información oculta en documentos?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-005 Metodología General de Pruebas de Intrusión a Aplicaciones Web v2.pdf"]
+    },
+    {
+      "id": "cib-006-atm",
+      "pregunta": "¿Qué validaciones se hacen al probar la seguridad de un cajero automático?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-006 Metodología General de Pruebas de Intrusión a Cajeros Automáticos v2.pdf"]
+    },
+    {
+      "id": "cib-007-hydra",
+      "pregunta": "¿Para qué se usa la herramienta Hydra en pruebas de intrusión a infraestructura?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-007 Metodología General de Pruebas de Intrusión a Infraestructura v2.pdf"]
+    },
+    {
+      "id": "cib-008-wifi",
+      "pregunta": "¿Cómo se captura y craquea la clave de una red Wi-Fi durante una prueba de intrusión?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-008 Metodología General de Pruebas de Intrusión a Redes Wireless IEEE 802.11 v2.pdf"]
+    },
+    {
+      "id": "cib-009-arquitectura",
+      "pregunta": "¿Qué aspectos abarca el diseño de la arquitectura de seguridad al desarrollar aplicaciones seguras?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-009 Metodología General para el Desarrollo de Aplicaciones Seguras v2.pdf"]
+    },
+    {
+      "id": "cib-010-caceria",
+      "pregunta": "¿Qué fuentes de datos y evidencia se utilizan en la cacería de amenazas?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-CIB-010 Metodología cacería de amenazas v1.pdf"]
+    },
+    {
+      "id": "ens-001-encuestas",
+      "pregunta": "¿Cuántos tipos de encuesta de satisfacción se aplican a los clientes?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-ENS-001_Metodologia de Proyectos v2.pdf"]
+    },
+    {
+      "id": "ens-002-proveedores",
+      "pregunta": "¿Qué obligaciones aplican al contratar a un proveedor que tratará datos personales por cuenta de la empresa?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-ENS-002 Politica General de Proteccion de Datos Personales v1.pdf"]
+    },
+    {
+      "id": "ens-002-codigo",
+      "pregunta": "¿Qué establece el documento M-ENS-002?",
+      "tipo": "codigo-clausula",
+      "areas": null,
+      "fuentes_esperadas": ["M-ENS-002 Politica General de Proteccion de Datos Personales v1.pdf"]
+    },
+    {
+      "id": "get-012-incentivo",
+      "pregunta": "¿Qué incentivo económico se paga por obtener la certificación avanzada de CrowdStrike?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-GET-012 Manual de Gestión de Talento v8.pdf"]
+    },
+    {
+      "id": "get-013-comite",
+      "pregunta": "¿Qué deben firmar los integrantes para instalar formalmente el Comité de Ética?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-GET-013 Lineamientos de Operación del Comité de ética  V2.pdf"]
+    },
+    {
+      "id": "get-014-voluntariado",
+      "pregunta": "¿Cuál es el objetivo del programa de voluntariado para los colaboradores?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-GET-014 MANUAL DEL VOLUNTARIO V1.pdf"]
+    },
+    {
+      "id": "mkt-001-marca",
+      "pregunta": "¿Dónde se definen los lineamientos de identidad de marca de la empresa?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-MKT-001_Identidad de Marca_v2.pdf"]
+    },
+    {
+      "id": "sgi-001-mision",
+      "pregunta": "¿Cuáles son la misión, la visión y los valores de la empresa?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-001 Manual de Sistema de Gestion Integral v16.pdf"]
+    },
+    {
+      "id": "sgi-002-confidencialidad",
+      "pregunta": "¿Qué exige la política de acuerdos de confidencialidad y no divulgación?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-002 Manual de Políticas del SGI v13.pdf"]
+    },
+    {
+      "id": "sgi-005-tratamiento",
+      "pregunta": "¿En qué consiste el tratamiento de riesgos y oportunidades?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-005 Metodologia de Analisis de Riesgo v8.pdf"]
+    },
+    {
+      "id": "sgi-007-antisoborno",
+      "pregunta": "¿Qué responsabilidades tienen los colaboradores frente al soborno?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-007 Manual del SGAS v8.pdf"]
+    },
+    {
+      "id": "sgi-008-bia",
+      "pregunta": "¿Cómo se clasifica la severidad de un impacto operacional en el análisis BIA?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-008 Metodología BIA v4.pdf"]
+    },
+    {
+      "id": "sgi-009-proveedores-sgia",
+      "pregunta": "¿Qué proceso y procedimiento se usan para evaluar a los proveedores según el SGIA?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SGI-009 Manual de Políticas del SGIA v3.pdf"]
+    },
+    {
+      "id": "sop-001-instalacion",
+      "pregunta": "¿Qué controles de seguridad deben seguirse al instalar el sistema operativo en un equipo?",
+      "tipo": "single-hop",
+      "areas": null,
+      "fuentes_esperadas": ["M-SOP-001-Manual de Controles de Seguridad para Instalación de Sistemas Operativos en Equipos de Cómputo.-v3-publicado.pdf"]
+    },
+    {
+      "id": "sop-001-codigo",
+      "pregunta": "¿Qué cubre el manual M-SOP-001?",
+      "tipo": "codigo-clausula",
+      "areas": null,
+      "fuentes_esperadas": ["M-SOP-001-Manual de Controles de Seguridad para Instalación de Sistemas Operativos en Equipos de Cómputo.-v3-publicado.pdf"]
+    }
+  ]
+}

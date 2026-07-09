@@ -1,16 +1,4 @@
-/**
- * Polyfill de `crypto.randomUUID` para CONTEXTOS NO SEGUROS (HTTP plano en LAN).
- *
- * `crypto.randomUUID` (igual que `crypto.subtle`) solo existe en un "secure
- * context": páginas HTTPS o http://localhost. Cuando la app se sirve por HTTP
- * a una IP de la red (p. ej. http://192.168.40.1:5000), `crypto.randomUUID`
- * es `undefined` y la primera llamada lanza `TypeError`, tumbando toda la app
- * antes de montar React (pantalla en blanco).
- *
- * `crypto.getRandomValues`, en cambio, SÍ está disponible sobre HTTP, así que
- * generamos un UUID v4 (RFC 4122) con él. Este módulo debe importarse ANTES que
- * cualquier otro para blindar también a dependencias que llamen a randomUUID.
- */
+// Polyfill de crypto.randomUUID para contextos no seguros (HTTP en LAN): randomUUID solo existe en secure context.
 function uuidv4(): string {
   const b = new Uint8Array(16);
   crypto.getRandomValues(b);
@@ -23,14 +11,13 @@ function uuidv4(): string {
 
 if (typeof crypto !== "undefined" && typeof crypto.randomUUID !== "function") {
   try {
-    // `crypto` puede ser de solo lectura; defineProperty es la vía más segura.
+    // crypto puede ser de solo lectura; defineProperty es la vía más segura.
     Object.defineProperty(crypto, "randomUUID", {
       value: uuidv4,
       configurable: true,
       writable: true,
     });
   } catch {
-    // Si ni siquiera se puede redefinir, no rompemos nada: el código propio usa
-    // `newId()` (nanoid), que no depende de este polyfill.
+    // no rompemos nada: el código propio usa newId() (nanoid).
   }
 }

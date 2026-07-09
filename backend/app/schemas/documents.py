@@ -1,5 +1,3 @@
-"""Schemas Pydantic de documentos indexados (guidelines §5)."""
-
 from pydantic import BaseModel
 
 

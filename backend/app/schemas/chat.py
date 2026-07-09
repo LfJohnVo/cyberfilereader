@@ -1,18 +1,8 @@
-"""Schemas Pydantic del chat (guidelines §5: contratos explícitos)."""
-
 from pydantic import BaseModel, Field
 
+from app.domain.models import Fuente
 
-class Source(BaseModel):
-    n: int
-    file_name: str
-    source: str
-    area: str
-    doc_type: str | None = None
-    version: str | None = None
-    page: int | None = None
-    score: float
-    snippet: str
+Source = Fuente
 
 
 class ChatRequest(BaseModel):
@@ -22,7 +12,7 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     answer: str
-    sources: list[Source]
+    sources: list[Fuente]
     no_info: bool
-    status: str  # estado final del agente: "idle" | "no_info" | "error"
+    status: str  # "idle" | "no_info" | "error"
     session_id: str

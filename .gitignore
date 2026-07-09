@@ -8,16 +8,6 @@ data/
 # y se monta de solo lectura (./docs:/data/docs:ro). Provista en cada entorno/despliegue.
 docs/
 
-# Configuración local del editor / herramientas
-.claude/
-
-# Documentación de proceso interno (no se publica)
-CLAUDE.md
-guidelines.md
-instructions.md
-skills-main/
-docs-proyecto/CHANGELOG-AGENTES.md
-
 # Python
 __pycache__/
 *.py[cod]
@@ -37,3 +27,5 @@ dist/
 Thumbs.db
 .idea/
 .vscode/
+
+CUsersJOHNAppDataLocalTempclaudeE--programs-laragon-python-agentessgif92a6330-5136-4e5f-a39d-36634e241b01scratchpadreport.json

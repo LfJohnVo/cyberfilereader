@@ -11,13 +11,12 @@ export interface Msg {
   noInfo?: boolean;
 }
 
-// nanoid usa crypto.getRandomValues (disponible sobre HTTP), a diferencia de
-// crypto.randomUUID, que solo existe en contextos seguros (HTTPS/localhost).
+// nanoid funciona sobre HTTP; crypto.randomUUID solo en contexto seguro.
 const sid = sessionStorage.getItem("sid") ?? nanoid();
 sessionStorage.setItem("sid", sid);
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const REVEAL_CPS = 20; // caracteres por segundo del efecto máquina de escribir
+const REVEAL_CPS = 20;
 let revealRAF = 0;
 
 interface ChatState {
@@ -53,7 +52,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
       agent.setStatus("searching");
       const res = await sendChat(text, sid, get().areas);
 
-      // Mensaje del asistente vacío: se irá "escribiendo" a la vez que habla.
       set((s) => ({
         messages: [...s.messages, { role: "assistant", content: "", noInfo: res.no_info }],
         sources: res.sources,
@@ -61,31 +59,33 @@ export const useChatStore = create<ChatState>((set, get) => ({
       agent.setStatus(res.no_info ? "no_info" : "answering");
       agent.setTalking(true);
 
-      // Voz (según ajustes del usuario) + revelado sincronizado del texto.
       const settings = useSettingsStore.getState();
       speak(res.answer, { presetId: settings.presetId, enabled: settings.voiceEnabled });
       await new Promise<void>((resolve) => {
         const full = res.answer;
         let startTs = 0;
+        let prevN = -1;
         const step = (ts: number) => {
           if (!startTs) startTs = ts;
           const n = Math.min(full.length, Math.floor(((ts - startTs) / 1000) * REVEAL_CPS));
-          set((s) => {
-            const msgs = s.messages.slice();
-            const li = msgs.length - 1;
-            if (li >= 0 && msgs[li].role === "assistant") {
-              msgs[li] = { ...msgs[li], content: full.slice(0, n) };
-            }
-            return { messages: msgs };
-          });
+          // Evita el set redundante cuando no hay caracteres nuevos en el frame.
+          if (n !== prevN) {
+            prevN = n;
+            set((s) => {
+              const msgs = s.messages.slice();
+              const li = msgs.length - 1;
+              if (li >= 0 && msgs[li].role === "assistant") {
+                msgs[li] = { ...msgs[li], content: full.slice(0, n) };
+              }
+              return { messages: msgs };
+            });
+          }
           if (n < full.length) revealRAF = requestAnimationFrame(step);
           else resolve();
         };
         revealRAF = requestAnimationFrame(step);
       });
 
-      // El texto terminó; la boca sigue moviéndose mientras la voz siga hablando
-      // (el Avatar observa speechSynthesis.speaking). Cerramos el estado "talking".
       agent.setTalking(false);
       agent.setStatus(res.no_info ? "no_info" : "idle");
       await wait(res.no_info ? 1500 : 500);

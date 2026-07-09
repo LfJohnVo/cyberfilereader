@@ -37,8 +37,26 @@ export async function sendChat(
   return r.json();
 }
 
-export const getAreas = (): Promise<{ areas: string[] }> =>
-  fetch(`${BASE}/api/areas`).then((r) => r.json());
+export const getAreas = async (): Promise<{ areas: string[] }> => {
+  const r = await fetch(`${BASE}/api/areas`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+};
+
+export interface Health {
+  status: string;
+  qdrant: boolean;
+  ollama: boolean;
+  collection: string;
+  chat_model?: string;
+  embed_model?: string;
+}
+
+export const getHealth = async (): Promise<Health> => {
+  const r = await fetch(`${BASE}/api/health`);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  return r.json();
+};
 
 export interface ComplianceResult {
   file_name: string;

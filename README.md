@@ -1,15 +1,16 @@
 # SGI-Agent
 
-Asistente conversacional empresarial con **RAG documental** y **núcleo 3D interactivo**.
-Permite consultar por chat la documentación del Sistema de Gestión Integral (ISO, políticas,
-procedimientos, manuales) con respuestas **fundamentadas solo en los documentos indexados**,
-citas verificables y **filtrado por área/permiso**. Incluye además **verificación de
-cumplimiento**: sube un documento y comprueba si cumple con las políticas/ISO del SGI.
+Asistente conversacional empresarial con **RAG documental** y **núcleo 3D interactivo con
+avatares intercambiables**. Permite consultar por chat la documentación del Sistema de Gestión
+Integral (ISO, políticas, procedimientos, manuales) con respuestas **fundamentadas solo en los
+documentos indexados**, citas verificables y **filtrado por área/permiso**. Incluye además
+**verificación de cumplimiento**: sube un documento y comprueba si cumple con las políticas/ISO
+del SGI.
 
 ## Stack
 
-- **Frontend:** React 18 + TypeScript + Vite · React Three Fiber + drei · Tailwind CSS · Zustand
-- **Backend:** Python 3.12 · FastAPI · LangChain
+- **Frontend:** React 19 + TypeScript + Vite · React Three Fiber (Three.js) · Tailwind CSS · Zustand
+- **Backend:** Python 3.12 · FastAPI · LangChain 1.0 + LangGraph · arquitectura hexagonal (DDD)
 - **Infra:** Qdrant Cloud (vector DB) · Ollama (LLM y embeddings locales)
 - **Orquestación:** Docker + Docker Compose
 
@@ -66,15 +67,24 @@ Copia `.env.example` a `.env` y completa los valores reales.
 | `DOCS_DIR` | `./docs` | Carpeta raíz de documentos (solo lectura). En Docker: `/data/docs`. |
 | `DATA_DIR` | `./data` | Carpeta de estado generado (`manifest.json`). |
 | `ALLOWED_EXTENSIONS` | `.pdf,.docx,.txt,.md,.xlsx,.csv` | Extensiones aceptadas en ingesta. |
-| `MAX_FILE_MB` | `25` | Tamaño máximo de archivo a ingerir (MB). |
+| `MAX_FILE_MB` | `25` | Tamaño máximo del archivo **comprimido** recibido (MB). |
+| `MAX_UNCOMPRESSED_MB` | `150` | Tope del contenido **descomprimido** de `.docx`/`.xlsx` (protección anti zip-bomb). |
 | `CHUNK_SIZE` | `1000` | Tamaño de chunk (caracteres). |
 | `CHUNK_OVERLAP` | `150` | Solapamiento entre chunks. |
 | `RETRIEVER_K` | `5` | Nº de fragmentos recuperados por consulta. |
-| `SCORE_THRESHOLD` | `0.65` | Similitud coseno mínima para aceptar contexto. |
+| `SCORE_THRESHOLD` | `0.50` | Similitud coseno mínima para aceptar contexto (recalibrar por modelo de embeddings; ver `backend/tests/eval`). |
+| `RERANK_ENABLED` | `false` | Reordena los candidatos densos con un cross-encoder (activar tras validar; descarga modelo ~1 GB). |
+| `RERANK_MODEL` | `jinaai/jina-reranker-v2-base-multilingual` | Modelo cross-encoder (fastembed). Alternativa ligera: `Xenova/ms-marco-MiniLM-L-6-v2`. |
+| `RERANK_CANDIDATES` | `20` | Nº de candidatos densos que pasan al reranker. |
+| `HYBRID_ENABLED` | `false` | Búsqueda híbrida densa+BM25 (RRF). Requiere re-ingestar la colección con vectores nombrados. |
+| `SPARSE_MODEL` | `Qdrant/bm25` | Modelo de embedding disperso (léxico) del modo híbrido. |
+| `CONDENSE_ENABLED` | `true` | Reformula preguntas de seguimiento con el historial para recuperar mejor. |
+| `CRAG_ENABLED` | `false` | Recuperación correctiva: evalúa el contexto y reintenta/`NO_INFO` si no basta (+1 llamada LLM). |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | URL de Ollama. En Docker: `http://host.docker.internal:11434`. |
 | `OLLAMA_CHAT_MODEL` | `qwen3:8b` | Modelo de chat. |
 | `OLLAMA_EMBED_MODEL` | `nomic-embed-text` | Modelo de embeddings. |
 | `OLLAMA_NUM_CTX` | `8192` | Ventana de contexto del LLM. |
+| `OLLAMA_REQUEST_TIMEOUT` | `120` | Timeout (s) de las llamadas a Ollama; evita que una inferencia colgada agote el pool de hilos. |
 | `LLM_TEMPERATURE` | `0.1` | Temperatura de generación (≤0.2 para respuestas documentales). |
 | `QDRANT_URL` | — | URL del cluster Qdrant Cloud (incluye `:6333`). |
 | `QDRANT_API_KEY` | — | API key de Qdrant Cloud. |
@@ -92,9 +102,46 @@ Copia `.env.example` a `.env` y completa los valores reales.
 
 ```
 agentessgi/
-├── backend/        # FastAPI + LangChain (app/, scripts/, tests/)
-├── frontend/       # React + Vite + React Three Fiber
-├── mcp/            # servidor MCP opcional
-├── docs/           # documentos de la empresa (solo lectura, no versionado)
-└── docs-proyecto/  # ADRs y planes
+├── backend/                 # FastAPI + LangChain 1.0 (arquitectura hexagonal)
+│   └── app/
+│       ├── domain/          # modelos y puertos (contratos)
+│       ├── application/     # casos de uso
+│       ├── infrastructure/  # adaptadores: rag, ingestion, memory, agent, db
+│       ├── api/             # rutas FastAPI (presentación)
+│       └── composition.py   # raíz de inyección de dependencias
+├── frontend/                # React 19 + Vite + React Three Fiber (avatares intercambiables)
+├── mcp/                     # servidor MCP opcional (misma recuperación que el chat)
+├── docs/                    # documentos de la empresa (solo lectura, no versionado)
+└── docs-proyecto/           # ADRs (decisiones de arquitectura)
 ```
+
+## Arquitectura
+
+El backend sigue **arquitectura hexagonal (puertos y adaptadores) con DDD**: el dominio
+(`app/domain`) define los contratos, los casos de uso (`app/application`) orquestan la lógica, y
+los adaptadores (`app/infrastructure`: Qdrant, Ollama, memoria, agente LangGraph) implementan los
+puertos. La composición de dependencias se resuelve en un único punto (`app/composition.py`).
+Detalle de la decisión en `docs-proyecto/adr/0001-arquitectura-hexagonal-ddd.md`.
+
+## Servidor MCP (opcional)
+
+Expone la recuperación documental como herramientas [MCP](https://modelcontextprotocol.io),
+reutilizando el mismo `retriever` que el chat (embeddings Ollama + filtro por área/estado), para
+que un agente o cliente MCP (Cursor, el MCP Inspector u otros compatibles) consulte el SGI.
+
+```bash
+pip install -r mcp/requirements.txt
+python mcp/server.py                                # stdio (clientes locales)
+python mcp/server.py --transport http --port 8765   # red / agentes
+```
+
+Herramientas:
+- **`sgi_buscar(query, areas?)`** — busca en la documentación vigente y devuelve fragmentos con su
+  fuente. `areas` filtra por permiso (`null` / `["*"]` = acceso total).
+- **`sgi_cumplimiento(ruta, areas?)`** — evalúa si un documento (PDF, DOCX, TXT, MD, XLSX, CSV)
+  cumple con las normas del SGI/ISO: veredicto, informe con hallazgos y fuentes citadas.
+  `sgi_cumplimiento_texto(documento, nombre, areas?)` hace lo mismo con el texto ya extraído.
+- **`sgi_estado()`** — colección, nº de fragmentos y modelo de embeddings.
+
+> El transporte `http` no lleva autenticación: expónlo solo en una red de confianza o detrás de un
+> proxy con auth. El servidor lee `backend/.env` (mismos Qdrant/Ollama que la API).

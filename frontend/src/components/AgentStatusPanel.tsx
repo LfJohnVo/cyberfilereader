@@ -1,9 +1,25 @@
+import { useEffect, useState } from "react";
+import { getHealth } from "../lib/api";
 import { useAgentStore } from "../stores/agentStore";
 import { STATUS_VISUALS } from "../three/statusVisuals";
 
 export default function AgentStatusPanel() {
   const status = useAgentStore((s) => s.status);
   const v = STATUS_VISUALS[status];
+  const [model, setModel] = useState("…");
+
+  useEffect(() => {
+    getHealth()
+      .then((h) =>
+        setModel(
+          h.chat_model
+            ? `ollama/${h.chat_model} · ${(h.embed_model ?? "").split(":")[0]}`
+            : "—",
+        ),
+      )
+      .catch(() => setModel("—"));
+  }, []);
+
   return (
     <aside className="neon clip-hud pointer-events-auto w-[248px] p-3 font-mono text-xs">
       <h2 className="glow mb-2 tracking-[0.25em] text-cyan-300">NÚCLEO // ICOSA-12</h2>
@@ -16,7 +32,7 @@ export default function AgentStatusPanel() {
         {v.label}
       </p>
       <p className="text-cyan-700/80">MODELO</p>
-      <p className="text-cyan-200">ollama/qwen3:8b · nomic-embed</p>
+      <p className="break-all text-cyan-200">{model}</p>
     </aside>
   );
 }

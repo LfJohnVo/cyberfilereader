@@ -1,5 +1,3 @@
-"""Utilidades de hashing (SHA-256 por streaming)."""
-
 import hashlib
 from pathlib import Path
 

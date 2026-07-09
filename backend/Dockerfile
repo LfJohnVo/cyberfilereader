@@ -4,9 +4,9 @@ FROM python:3.12-slim
 RUN useradd --create-home appuser
 WORKDIR /app
 
-# Capa de dependencias separada: solo se reconstruye si cambia requirements.txt
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Capa de dependencias separada: instala desde el lockfile (reproducible).
+COPY requirements.lock .
+RUN pip install --no-cache-dir -r requirements.lock
 
 COPY app/ ./app/
 COPY scripts/ ./scripts/

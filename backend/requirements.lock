@@ -203,7 +203,7 @@ python-dotenv==1.2.2
     #   uvicorn
 python-multipart==0.0.32
     # via -r requirements.txt
-pywin32==312
+pywin32==312 ; sys_platform == 'win32'
     # via portalocker
 pyyaml==6.0.3
     # via
@@ -278,7 +278,7 @@ websockets==15.0.1
     #   langgraph-sdk
     #   langsmith
     #   uvicorn
-win32-setctime==1.2.0
+win32-setctime==1.2.0 ; sys_platform == 'win32'
     # via loguru
 wrapt==2.2.2
     # via deprecated

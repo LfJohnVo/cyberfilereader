@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { type ComplianceResult, checkCompliance, getAreas } from "../lib/api";
 
 const VERDICT_STYLE: Record<string, string> = {
@@ -52,11 +53,12 @@ export default function ComplianceModal() {
         </button>
       </aside>
 
-      {open && (
-        <div
-          className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 font-mono"
-          onClick={() => setOpen(false)}
-        >
+      {open &&
+        createPortal(
+          <div
+            className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 font-mono"
+            onClick={() => setOpen(false)}
+          >
           <div
             className="neon clip-hud flex max-h-[86vh] w-full max-w-2xl flex-col p-5 text-sm"
             onClick={(e) => e.stopPropagation()}
@@ -135,8 +137,9 @@ export default function ComplianceModal() {
               )}
             </div>
           </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }

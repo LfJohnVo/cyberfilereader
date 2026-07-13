@@ -18,6 +18,8 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const REVEAL_CPS = 20;
 let revealRAF = 0;
+// Handle del revelado en curso: permite saltarlo (mostrar todo) desde fuera de send().
+let activeReveal: { done: () => void } | null = null;
 
 interface ChatState {
   messages: Msg[];
@@ -27,6 +29,7 @@ interface ChatState {
   setAreas: (a: string) => void;
   send: (text: string) => Promise<void>;
   stop: () => void;
+  revealNow: () => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -65,23 +68,37 @@ export const useChatStore = create<ChatState>((set, get) => ({
         const full = res.answer;
         let startTs = 0;
         let prevN = -1;
+        const writeUpTo = (n: number) =>
+          set((s) => {
+            const msgs = s.messages.slice();
+            const li = msgs.length - 1;
+            if (li >= 0 && msgs[li].role === "assistant") {
+              msgs[li] = { ...msgs[li], content: full.slice(0, n) };
+            }
+            return { messages: msgs };
+          });
+        const finish = () => {
+          activeReveal = null;
+          resolve();
+        };
+        // Saltar el revelado: vuelca el texto completo de inmediato y termina.
+        activeReveal = {
+          done: () => {
+            cancelAnimationFrame(revealRAF);
+            writeUpTo(full.length);
+            finish();
+          },
+        };
         const step = (ts: number) => {
           if (!startTs) startTs = ts;
           const n = Math.min(full.length, Math.floor(((ts - startTs) / 1000) * REVEAL_CPS));
           // Evita el set redundante cuando no hay caracteres nuevos en el frame.
           if (n !== prevN) {
             prevN = n;
-            set((s) => {
-              const msgs = s.messages.slice();
-              const li = msgs.length - 1;
-              if (li >= 0 && msgs[li].role === "assistant") {
-                msgs[li] = { ...msgs[li], content: full.slice(0, n) };
-              }
-              return { messages: msgs };
-            });
+            writeUpTo(n);
           }
           if (n < full.length) revealRAF = requestAnimationFrame(step);
-          else resolve();
+          else finish();
         };
         revealRAF = requestAnimationFrame(step);
       });
@@ -106,9 +123,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   stop: () => {
     cancelAnimationFrame(revealRAF);
+    activeReveal = null;
     stopSpeaking();
     useAgentStore.getState().setTalking(false);
     useAgentStore.getState().setStatus("idle");
     set({ loading: false });
+  },
+
+  // Muestra la respuesta completa de inmediato y silencia la voz (salta el efecto de tipeo).
+  revealNow: () => {
+    stopSpeaking();
+    activeReveal?.done();
   },
 }));

@@ -7,9 +7,11 @@ import VoiceControls from "./components/VoiceControls";
 import ChatPanel from "./components/chat/ChatPanel";
 import SourcesPanel from "./components/SourcesPanel";
 import { primeVoices } from "./lib/tts";
+import { useSettingsStore } from "./stores/settingsStore";
 import Scene from "./three/Scene";
 
 export default function App() {
+  const chatExpanded = useSettingsStore((s) => s.chatExpanded);
   useEffect(() => {
     primeVoices();
   }, []);
@@ -46,7 +48,11 @@ export default function App() {
         <SourcesPanel />
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-20 h-[34vh] px-5 pb-4 pt-2">
+      <div
+        className={`absolute inset-x-0 bottom-0 z-20 px-5 pb-4 pt-2 transition-[height] duration-300 ${
+          chatExpanded ? "h-[72vh]" : "h-[34vh]"
+        }`}
+      >
         <div className="mx-auto h-full max-w-[1400px]">
           <ChatPanel />
         </div>
